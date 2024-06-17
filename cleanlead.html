@@ -6,8 +6,37 @@
   <title>Excel and CSV Processor</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    .container { margin-top: 50px; }
-    .table-container { margin-top: 20px; display: none; }
+    body {
+      background-color: #f8f9fa;
+    }
+    .container {
+      margin-top: 50px;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .table-container {
+      margin-top: 20px;
+      display: none;
+    }
+    table {
+      margin-top: 20px;
+      background-color: #ffffff;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    .btn {
+      margin-top: 10px;
+    }
+    #table1Container, #table2Container {
+      margin-top: 30px;
+    }
+    h1, h3, h4 {
+      color: #343a40;
+    }
   </style>
 </head>
 <body>
@@ -17,19 +46,25 @@
       <div class="form-group">
         <input type="file" id="fileInput" class="form-control" accept=".csv,.xlsx,.xls" required />
       </div>
-      <button type="button" id="processButton" class="btn btn-primary">Process</button>
+      <button type="button" id="processButton" class="btn btn-primary btn-block">Process</button>
     </form>
     <div id="tablesContainer" class="table-container">
-      <h3>Generated Tables:</h3>
+      <h3 class="text-center">Generated Tables</h3>
       <div id="table1Container">
         <h4>Table 1</h4>
-        <table id="table1" class="table table-bordered"></table>
-        <button id="downloadTable1" class="btn btn-success">Download Table 1</button>
+        <table id="table1" class="table table-bordered table-hover table-sm">
+          <thead class="thead-dark"></thead>
+          <tbody></tbody>
+        </table>
+        <button id="downloadTable1" class="btn btn-success btn-block">Download Table 1</button>
       </div>
       <div id="table2Container">
         <h4>Table 2</h4>
-        <table id="table2" class="table table-bordered"></table>
-        <button id="downloadTable2" class="btn btn-success">Download Table 2</button>
+        <table id="table2" class="table table-bordered table-hover table-sm">
+          <thead class="thead-dark"></thead>
+          <tbody></tbody>
+        </table>
+        <button id="downloadTable2" class="btn btn-success btn-block">Download Table 2</button>
       </div>
     </div>
   </div>
@@ -90,8 +125,8 @@
             'Company Name': row.company_name,
             Title: row.job_title,
             Industry: row.industry,
-            'Sub Industry': '', // Assuming this field needs to be added or filled with additional logic
-            'Relation with Huawei': '', // Assuming this field needs to be added or filled with additional logic
+            'Sub Industry': '',
+            'Relation with Huawei': '',
             'Action Type': 'pricing form submit',
             'Touch Point Type': 'Social Media-Facebook',
             'Brief Project Description': `2024 Q2 HUAWEI eKit UAE SOHO Project runs sponsor content ads on Facebook, the potential customer is a ${row['what_type_of_company_are_you?']} who has submitted a consultation Form via ${row.platform}. The briefly outline project requirements is "${row.briefly_outline_your_project_requirements}". (Remark: This general project description is provided by the HQ of digital promotion for reference only.)`,
@@ -104,7 +139,7 @@
             source: row.source,
             'utm-object': row.utm_object,
             'utm-content': row.utm_content,
-            'utm-term': '', // Assuming this field needs to be added or filled with additional logic
+            'utm-term': '',
             'Action Location URL': 'https://e.huawei.com/ae/promotion/2024/ae/huaweiekit-sme-network',
             'I agree that Huawei contact me': row['i_agree_to_receive_information_about_products,_solutions,_services,_and_offerings_from_huawei_and_huawei_authorized_channel_partners._i_understand_that_i_can_unsubscribe_at_any_time._i_agree_to_receive_a_best_offer_by_calling_from_huawei_and_huawei_author'],
             'Submit Time': row.created_time,
@@ -138,13 +173,13 @@
     });
 
     function populateTable(tableSelector, data) {
-      const table = document.querySelector(tableSelector);
+      const table = document.querySelector(tableSelector + ' tbody');
       table.innerHTML = '';
 
       if (data.length > 0) {
         const headers = Object.keys(data[0]);
         const headerRow = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
-        table.innerHTML += headerRow;
+        document.querySelector(tableSelector + ' thead').innerHTML = headerRow;
 
         data.forEach(row => {
           const rowHtml = '<tr>' + headers.map(h => `<td>${row[h]}</td>`).join('') + '</tr>';
