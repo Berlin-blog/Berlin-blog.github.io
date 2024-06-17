@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload and Preview CSV/Excel</title>
+  <title>Excel and CSV Processor</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
     .container { margin-top: 50px; }
@@ -12,68 +12,152 @@
 </head>
 <body>
   <div class="container">
-    <h1 class="text-center">Upload CSV or Excel File</h1>
-    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+    <h1 class="text-center">Upload and Process CSV/Excel File</h1>
+    <form id="uploadForm">
       <div class="form-group">
-        <input type="file" name="file" id="fileInput" class="form-control" accept=".csv,.xlsx,.xls" required />
+        <input type="file" id="fileInput" class="form-control" accept=".csv,.xlsx,.xls" required />
       </div>
-      <button type="submit" class="btn btn-primary">Upload</button>
+      <button type="button" id="processButton" class="btn btn-primary">Process</button>
     </form>
     <div id="tablesContainer" class="table-container">
       <h3>Generated Tables:</h3>
       <div id="table1Container">
         <h4>Table 1</h4>
         <table id="table1" class="table table-bordered"></table>
+        <button id="downloadTable1" class="btn btn-success">Download Table 1</button>
       </div>
       <div id="table2Container">
         <h4>Table 2</h4>
         <table id="table2" class="table table-bordered"></table>
+        <button id="downloadTable2" class="btn btn-success">Download Table 2</button>
       </div>
     </div>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script>
-    $(document).ready(function() {
-      $('#uploadForm').on('submit', function(event) {
-        event.preventDefault();
-        var formData = new FormData(this);
-        
-        $.ajax({
-          url: '/upload',
-          type: 'POST',
-          data: formData,
-          contentType: false,
-          processData: false,
-          success: function(data) {
-            $('#tablesContainer').show();
-            populateTable('#table1', data.table1);
-            populateTable('#table2', data.table2);
-          },
-          error: function(xhr, status, error) {
-            alert('File upload failed: ' + error);
-          }
-        });
-      });
+    document.getElementById('processButton').addEventListener('click', function() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const data = new Uint8Array(event.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-      function populateTable(tableSelector, data) {
-        var table = $(tableSelector);
-        table.empty();
+          const output1Rows = [];
+          const output2Rows = [];
 
-        if (data.length > 0) {
-          var headers = Object.keys(data[0]);
-          var headerRow = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
-          table.append(headerRow);
+          rows.forEach(row => {
+            const output1Row = {
+              Source_Name: `${row.campaign_name}_Leads_${row.created_time.replace(/\//g, '-')}`,
+              id: row.id,
+              created_time: row.created_time,
+              ad_id: row.ad_id,
+              ad_name: row.ad_name,
+              adset_id: row.adset_id,
+              adset_name: row.adset_name,
+              campaign_id: row.campaign_id,
+              campaign_name: row.campaign_name,
+              form_id: row.form_id,
+              form_name: row.form_name,
+              is_organic: row.is_organic,
+              platform: row.platform,
+              industry: row.industry,
+              what_type_of_company_are_you: row.what_type_of_company_are_you,
+              i_agree_to_receive_information: row.i_agree_to_receive_information_about_products_solutions_services_and_offerings_from_huawei_and_huawei_authorized_channel_partners_i_understand_that_i_can_unsubscribe_at_any_time_i_agree_to_receive_a_best_offer_by_calling_from_huawei_and_huawei_authorized_channel_partners,
+              briefly_outline_your_project_requirements: row.briefly_outline_your_project_requirements,
+              first_name: row.first_name,
+              last_name: row.last_name,
+              email: row.email,
+              phone_number: row.phone_number,
+              country: row.country,
+              job_title: row.job_title,
+              company_name: row.company_name,
+              utm_campaign: row.utm_campaign,
+              utm_source: row.utm_source,
+              utm_medium: row.utm_medium,
+              utm_content: row.utm_content,
+              utm_object: row.utm_object,
+              source: row.source,
+              lead_status: row.lead_status,
+            };
 
-          data.forEach(row => {
-            var rowHtml = '<tr>' + headers.map(h => `<td>${row[h]}</td>`).join('') + '</tr>';
-            table.append(rowHtml);
+            output1Rows.push(output1Row);
+
+            const output2Row = {
+              'Action Type': 'pricing form submit',
+              'Touch Point Type': 'Social Media-Facebook',
+              'Brief Project Description': row.briefly_outline_your_project_requirements,
+              'Project budget': '',
+              'Interested Product': '',
+              'tactic code': row.form_id,
+              'utm_medium': row.utm_medium,
+              'utm_source': row.utm_source,
+              'utm-campaign': row.utm_campaign,
+              'source': row.source,
+              'utm-object': row.utm_object,
+              'utm-content': row.utm_content,
+              'utm-term': row.utm_term || '',
+              'Action Location URL': 'https://e.huawei.com/ae/promotion/2024/ae/huaweiekit-sme-network',
+              'I agree that Huawei contact me': 'Y',
+              'Submit Time': row.created_time,
+              'product_tag': '',
+              'solution_tag': '',
+              'industry_tag': '',
+              'Touch Point Position': '',
+              'Touch Point Others': '',
+              'State Or Province': '',
+              'City': '',
+              'District/county': '',
+              'Offer ID': row.form_id,
+              'Offer Name': row.form_name,
+              'Whether urgent processing is required': '',
+            };
+
+            output2Rows.push(output2Row);
           });
-        }
+
+          populateTable('#table1', output1Rows);
+          populateTable('#table2', output2Rows);
+          document.getElementById('tablesContainer').style.display = 'block';
+
+          document.getElementById('downloadTable1').addEventListener('click', function() {
+            downloadExcel('Table1.xlsx', output1Rows);
+          });
+
+          document.getElementById('downloadTable2').addEventListener('click', function() {
+            downloadExcel('Table2.xlsx', output2Rows);
+          });
+        };
+        reader.readAsArrayBuffer(file);
       }
     });
+
+    function populateTable(tableSelector, data) {
+      const table = document.querySelector(tableSelector);
+      table.innerHTML = '';
+
+      if (data.length > 0) {
+        const headers = Object.keys(data[0]);
+        const headerRow = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+        table.innerHTML += headerRow;
+
+        data.forEach(row => {
+          const rowHtml = '<tr>' + headers.map(h => `<td>${row[h]}</td>`).join('') + '</tr>';
+          table.innerHTML += rowHtml;
+        });
+      }
+    }
+
+    function downloadExcel(filename, data) {
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      XLSX.writeFile(wb, filename);
+    }
   </script>
-<script src="js/Node.js"></script>
-<script src="js/clean.js"></script>
 </body>
-  
 </html>
