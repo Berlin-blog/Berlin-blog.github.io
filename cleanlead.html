@@ -2,16 +2,75 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload and Process Excel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        input[type="file"] {
+            display: block;
+            margin: 20px auto;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: #007BFF;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
-    <input type="file" id="excelFile" accept=".xlsx">
-    <button id="uploadButton">Upload and Process</button>
-    <table id="previewTable"></table>
-    <button id="downloadButton" style="display:none;">Download Processed Excel</button>
+    <div class="container">
+        <h1>Upload and Process Excel</h1>
+        <input type="file" id="excelFile" accept=".xlsx">
+        <button id="uploadButton"><i class="fas fa-upload"></i> Upload and Process</button>
+        <table id="previewTable"></table>
+        <button id="downloadButton" style="display:none;"><i class="fas fa-download"></i> Download Processed Excel</button>
+    </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="js/clean.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
