@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload and Process Excel</title>
+</head>
+<body>
+    <input type="file" id="excelFile" accept=".xlsx">
+    <button id="uploadButton">Upload and Process</button>
+    <table id="previewTable"></table>
+    <button id="downloadButton" style="display:none;">Download Processed Excel</button>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="clean.js"></script>
+</body>
+</html>
