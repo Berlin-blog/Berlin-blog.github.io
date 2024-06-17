@@ -94,7 +94,7 @@
             'Relation with Huawei': '', // Assuming this field needs to be added or filled with additional logic
             'Action Type': 'pricing form submit',
             'Touch Point Type': 'Social Media-Facebook',
-            'Brief Project Description': `2024 Q2 HUAWEI eKit UAE SOHO Project runs sponsor content ads on Facebook, the potential customer is a ${row.what_type_of_company_are_you} who has submitted a consultation Form via ${row.platform}. The briefly outline project requirements is "${row.briefly_outline_your_project_requirements}". (Remark: This general project description is provided by the HQ of digital promotion for reference only.)`,
+            'Brief Project Description': `2024 Q2 HUAWEI eKit UAE SOHO Project runs sponsor content ads on Facebook, the potential customer is a ${row['what_type_of_company_are_you?']} who has submitted a consultation Form via ${row.platform}. The briefly outline project requirements is "${row.briefly_outline_your_project_requirements}". (Remark: This general project description is provided by the HQ of digital promotion for reference only.)`,
             'Project budget': '',
             'Interested Product': '',
             'tactic code': row.utm_campaign,
@@ -106,7 +106,7 @@
             'utm-content': row.utm_content,
             'utm-term': '', // Assuming this field needs to be added or filled with additional logic
             'Action Location URL': 'https://e.huawei.com/ae/promotion/2024/ae/huaweiekit-sme-network',
-            'I agree that Huawei contact me': 'Y',
+            'I agree that Huawei contact me': row['i_agree_to_receive_information_about_products,_solutions,_services,_and_offerings_from_huawei_and_huawei_authorized_channel_partners._i_understand_that_i_can_unsubscribe_at_any_time._i_agree_to_receive_a_best_offer_by_calling_from_huawei_and_huawei_author'],
             'Submit Time': row.created_time,
             'product_tag': '',
             'solution_tag': '',
