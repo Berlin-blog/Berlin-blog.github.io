@@ -126,11 +126,11 @@
           document.getElementById('tablesContainer').style.display = 'block';
 
           document.getElementById('downloadTable1').addEventListener('click', function() {
-            downloadExcel('fb_recruiting_file.xlsx', output1Rows);
+            downloadExcel('original.xlsx', output1Rows);
           });
 
           document.getElementById('downloadTable2').addEventListener('click', function() {
-            downloadExcel('2024-06-03fb_uae_soho_esale.xlsx', output2Rows);
+            downloadExcel('cleanlead.xlsx', output2Rows);
           });
         };
         reader.readAsArrayBuffer(file);
