@@ -48,7 +48,7 @@
             "bao1":"images/fruits/bao1.png",
             "bao2":"images/fruits/bao2.png",
             "bao3":"images/fruits/bao3.png",
-            "background":"images/fruits/background.jpg",
+            "background":"images/fruits/background.png",
         }
         var amount = Object.keys(this.josn).length;
         var count = 0;
