@@ -1,0 +1,81 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: #2a3852;
+        }
+ 
+        #box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-top: 300px;
+        }
+ 
+        #box h2 {
+            letter-spacing: 3px;
+            font-weight: 300;
+            color: #fff;
+        }
+ 
+        #time {
+            display: flex;
+            flex-direction: row;
+            line-height: 50px;
+        }
+ 
+        #time span {
+            font-size: 20px;
+            color: #fff;
+        }
+ 
+        #time strong {
+            text-align: center;
+            margin-left: 20px;
+            background-color: #3f5174;
+            border-radius: 60px;
+            width: 80px;
+            height: 50px;
+            display: block;
+            font-size: 20px;
+            color: #fff;
+        }
+    </style>
+</head>
+ 
+<body>
+ 
+    <div id="box">
+        <h2>Countdown to work</h2>
+        <div id="time">
+            <strong><span id="hour">0</span>时</strong>
+            <strong><span id="minute">0</span>分</strong>
+            <strong><span id="second">0</span>秒</strong>
+        </div>
+    </div>
+    <script>
+        function showTime() {
+            var spans = document.querySelectorAll('span');
+            var endTime = new Date(new Date().toLocaleDateString()).getTime() + 17 * 60 * 60 * 1000+1800*1000;
+            var newTime = new Date().getTime();
+            var diffTime = (endTime - newTime) / 1000;
+            var honur = parseInt(diffTime / 60 / 60 % 24);
+            var min = parseInt(diffTime / 60 % 60);
+            var sen = parseInt(diffTime % 60);
+            spans[0].innerText = honur;
+            spans[1].innerText = min;
+            spans[2].innerText = sen;
+        }
+        setInterval(showTime, 1000)
+ 
+ 
+    </script>
+</body>
+ 
+</html>
