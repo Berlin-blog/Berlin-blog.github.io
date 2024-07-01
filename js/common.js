@@ -126,24 +126,24 @@ com.loadImages = function(stype){
 	
 	//绘制棋盘
 	com.bgImg = new Image();
-	com.bgImg.src  = "img/"+stype+"/bg.png";
+	com.bgImg.src  = "images/"+stype+"/bg.png";
 	
 	//提示点
 	com.dotImg = new Image();
-	com.dotImg.src  = "img/"+stype+"/dot.png";
+	com.dotImg.src  = "images/"+stype+"/dot.png";
 	
 	//棋子
 	for (var i in com.args){
 		com[i] = {};
 		com[i].img = new Image();
-		com[i].img.src = "img/"+stype+"/"+ com.args[i].img +".png";
+		com[i].img.src = "images/"+stype+"/"+ com.args[i].img +".png";
 	}
 	
 	//棋子外框
 	com.paneImg = new Image();
-	com.paneImg.src  = "img/"+stype+"/r_box.png";
+	com.paneImg.src  = "images/"+stype+"/r_box.png";
 	
-	document.getElementsByTagName("body")[0].style.background= "url(img/"+stype+"/bg.jpg)";
+	document.getElementsByTagName("body")[0].style.background= "url(images/"+stype+"/bg.jpg)";
 	
 }
 
@@ -727,22 +727,22 @@ com.value.Z = com.arr2Clone(com.value.z).reverse();
 //棋子们
 com.args={
 	//红子 中文/图片地址/阵营/权重
-	'c':{text:"车", img:'r_c', my:1 ,bl:"c", value:com.value.c},
-	'm':{text:"马", img:'r_m', my:1 ,bl:"m", value:com.value.m},
-	'x':{text:"相", img:'r_x', my:1 ,bl:"x", value:com.value.x},
-	's':{text:"仕", img:'r_s', my:1 ,bl:"s", value:com.value.s},
-	'j':{text:"将", img:'r_j', my:1 ,bl:"j", value:com.value.j},
-	'p':{text:"炮", img:'r_p', my:1 ,bl:"p", value:com.value.p},
-	'z':{text:"兵", img:'r_z', my:1 ,bl:"z", value:com.value.z},
+	'c':{text:"车", images:'r_c', my:1 ,bl:"c", value:com.value.c},
+	'm':{text:"马", images:'r_m', my:1 ,bl:"m", value:com.value.m},
+	'x':{text:"相", images:'r_x', my:1 ,bl:"x", value:com.value.x},
+	's':{text:"仕", images:'r_s', my:1 ,bl:"s", value:com.value.s},
+	'j':{text:"将", images:'r_j', my:1 ,bl:"j", value:com.value.j},
+	'p':{text:"炮", images:'r_p', my:1 ,bl:"p", value:com.value.p},
+	'z':{text:"兵", images:'r_z', my:1 ,bl:"z", value:com.value.z},
 	
 	//蓝子
-	'C':{text:"車", img:'b_c', my:-1 ,bl:"c", value:com.value.C},
-	'M':{text:"馬", img:'b_m', my:-1 ,bl:"m", value:com.value.M},
-	'X':{text:"象", img:'b_x', my:-1 ,bl:"x", value:com.value.X},
-	'S':{text:"士", img:'b_s', my:-1 ,bl:"s", value:com.value.S},
-	'J':{text:"帅", img:'b_j', my:-1 ,bl:"j", value:com.value.J},
-	'P':{text:"炮", img:'b_p', my:-1 ,bl:"p", value:com.value.P},
-	'Z':{text:"卒", img:'b_z', my:-1 ,bl:"z", value:com.value.Z}
+	'C':{text:"車", images:'b_c', my:-1 ,bl:"c", value:com.value.C},
+	'M':{text:"馬", images:'b_m', my:-1 ,bl:"m", value:com.value.M},
+	'X':{text:"象", images:'b_x', my:-1 ,bl:"x", value:com.value.X},
+	'S':{text:"士", images:'b_s', my:-1 ,bl:"s", value:com.value.S},
+	'J':{text:"帅", images:'b_j', my:-1 ,bl:"j", value:com.value.J},
+	'P':{text:"炮", images:'b_p', my:-1 ,bl:"p", value:com.value.P},
+	'Z':{text:"卒", images:'b_z', my:-1 ,bl:"z", value:com.value.Z}
 };
 
 com.class = com.class || {} //类
