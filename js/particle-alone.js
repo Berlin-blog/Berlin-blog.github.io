@@ -1,8 +1,5 @@
 $(function(){
-	/**
- * @author Nicolas Barradeau 
- * http://en.nicoptere.net
- */
+
 (function() 
 {
 	var c;
