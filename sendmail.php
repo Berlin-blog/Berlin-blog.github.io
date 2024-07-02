@@ -23,7 +23,7 @@ $mail->addAddress("2088927145@qq.com","");
 //$mail->addAttachment("bug0.jpg");      // 添加附件
 
 //下面是将前面表单中填写的数据进行转码。
-$nametemp = $_POST['name'];
+$nametemp = $_POST['username'];
 $name2 = iconv('UTF-8','GB2312',$nametemp);
 
 $emailtemp = $_POST['email'];
@@ -32,18 +32,18 @@ $email2 = iconv('UTF-8','GB2312',$emailtemp);
 $phoneltemp = $_POST['phone'];
 $phone2 = iconv('UTF-8','GB2312',$phoneltemp);
 
-$bookSelecttemp = $_POST['bookSelect'];
+$bookSelecttemp = $_POST['subject'];
 $bookSelect2 = iconv('UTF-8','GB2312',$bookSelecttemp);
 
-$commentstemp = $_POST['comments'];
+$commentstemp = $_POST['message'];
 $comments2 = iconv('UTF-8','GB2312',$commentstemp);
  
 $mail->Subject = "Berlin-blog收到新留言啦~";   
-$mail->Body = "　　用户姓名：".$name2."
-　　QQ号码：".$email2."
-　　手机号码：".$phone2."
-　　反馈资料：".$bookSelect2."
-　　反馈信息：".$comments2;
+$mail->Body = "　　Name：".$name2."
+　　Email：".$email2."
+　　Phone：".$phone2."
+　　WeChat：".$bookSelect2."
+　　Message：".$comments2;
 
 //定义成功或出错弹窗显示的文本信息
 $falied = "信息发送失败，请联系网站管理员！";
