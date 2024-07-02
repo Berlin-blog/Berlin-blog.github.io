@@ -8,7 +8,7 @@ $mail->CharSet = "GB2312";
 $mail->Host = "smtp.163.com";     
 $mail->SMTPAuth = true;			
 $mail->Username = "berlinli0801@163.com";  
-$mail->Password = "Libolin122623"; 
+$mail->Password = "Libolin122623"; //邮箱授权码
 $mail->SMTPSecure = "ssl";	
 $mail->Port = 465;   		
 //$mail->isHTML(true); 
