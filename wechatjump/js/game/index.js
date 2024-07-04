@@ -1,4 +1,4 @@
-const Game = require('./game')
+const Game = require('wechatjump/js/game')
 
 function init() {
     window.onload = function () {
