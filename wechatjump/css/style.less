@@ -1,0 +1,152 @@
+@green: #a4e8af;
+@darkGreen: #3fd651;
+@lightGreen: #00ff1e;
+@white: #eeeeee;
+@gray: #9e9e9e;
+@black: #6d6d6d;
+@lightGray: #dbdbdb;
+@lightBlack: #cbcbcb;
+@brown: #636363;
+@middleLightGreen: #74a379;
+@middleLightGray: #bbbbbb;
+@middleLightBlack: #888888;
+
+@ch_regular: 'PingFang SC Medium';
+@ch_bold: 'PingFang SC Heavy';
+@en_regular: 'ubuntu bold';
+@number: 'number';
+
+@font-face {
+    font-family: 'ubuntu bold';
+    src: url(../res/font/Ubuntu-B.ttf);
+}
+
+@font-face {
+    font-family: 'number';
+    src: url(../res/font/04b24.ttf);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: @en_regular, @ch_regular;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+
+body{
+  padding: 0;
+  margin: 0;
+  background: #f5f5f5;
+//   width: 100vw;
+//   height: 100vh;
+}
+
+.page{
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+    left:0;
+    right:0;
+    top:0;
+    bottom: 0;
+    background-color: silver;
+    text-align: center;
+  
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    #logo{
+        font-size: 50px;
+        font-family: @ch_bold;
+        color: white;
+        margin-bottom: 6px;
+    }
+
+    #final-score{
+        position: relative;
+
+        @height: 150px;
+        width: 240px;
+        height: @height;
+        border-radius: 5px;
+        font-size: 60px;
+        font-family: @en_regular;
+        color: @lightGreen;
+        background: @brown;
+        .hint{
+            font-family: @ch_regular;
+            line-height: 20px;
+            margin-top: 25px;
+            // margin-bottom: 10px;
+            color: white;
+            font-size: 10px;
+        }
+    }
+
+    .description{
+        font-size: 12px;
+        font-family: @ch_regular;
+        color: white;
+        margin-bottom: 3px;
+    }
+
+    .btn{
+        @height: 60px;
+        width: 190px;
+        height: @height;
+        line-height: @height;
+        border-radius: (@height/2);
+        margin-top: 70px;
+        background: white;
+        font-size: 18px;
+        cursor: pointer;
+        i{
+            color: @darkGreen;
+            margin-left: 5px;
+        }
+    }
+}
+
+
+#score{
+    position: absolute;
+    z-index: 1;
+    width: 30px;
+    height: 30px;
+    top: 60px;
+    left: 40px;
+    font-size: 45px;
+    font-family: @number;
+    text-align: center;
+    line-height: 20px;
+    color: @black;
+}
+
+.MyToast{
+    z-index: 1;
+    position: fixed;
+    top: 30%;
+    left: calc(50% - 15px);
+    width: 30px;
+    font-size: 50px;
+    font-family: @number;
+    color: @black;
+}
+
+.MyToast.appear{
+    
+}
+
+.MyToast.disappear{
+    opacity: 0;
+    transform: translateY(-20px);
+    transition-duration: 0.25s;
+}
+
