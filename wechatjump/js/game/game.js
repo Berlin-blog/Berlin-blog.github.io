@@ -1,7 +1,7 @@
 const THREE = require('three')
-const ModelConfig = require('./modelConfig')
-const Tween = new (require('../lib/Tween'))()
-const AudioManager = require('./audioManager')
+const ModelConfig = require('wechatjump/js/game/modelConfig')
+const Tween = new (require('wechatjump/js/lib/Tween'))()
+const AudioManager = require('wechatjump/js/game/audioManager')
 const ThreeObjMtlLoader = require('three-obj-mtl-loader')
 const OBJLoader = ThreeObjMtlLoader.OBJLoader
 const MTLLoader = ThreeObjMtlLoader.MTLLoader
