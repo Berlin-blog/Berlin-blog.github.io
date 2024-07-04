@@ -8,8 +8,8 @@ module.exports = {
     // mode: 'production',
     mode: 'development',
     entry: {
-        style: './js/style.js',
-        main: './js/main.js',
+        style: 'wechatjump/js/style.js',
+        main: 'wechatjump/js/main.js',
         vendor: ['three', 'three-obj-mtl-loader']
     },
     output: {
@@ -31,12 +31,12 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: './index.html',
+            template: 'wechatjump/index.html',
             title: 'WechatJump'
         }),
         new CopyWebpackPlugin([{
-            from: './res',
-            to: './res'
+            from: 'wechatjump/res',
+            to: 'wechatjump/res'
         }]),
         new webpack.HotModuleReplacementPlugin(),
         new BundleAnalyzerPlugin()
