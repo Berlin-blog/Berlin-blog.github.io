@@ -57,13 +57,8 @@
 		//注册成功存入localStorage,并且弹回登录界面
 		else{
 			localStorage.setItem(user_name,user_password);
-			alert("注册成功！正在跳转。。。");
-			//注册完成实现延时跳转登录 
-			//第二种延时跳转
-			setTimeout(function(){
-				window.location.href = "https://berlin-blog.github.io/chat/entry.html";
-				container.classList.remove("right-panel-active");
-			},1000);  //1秒
+			alert("注册成功！");
+			container.classList.remove("right-panel-active");
 		}
 	})
 </script>
@@ -83,7 +78,7 @@
 		if(user_nameArr.includes(user_name)){
 			var store_password = localStorage.getItem(user_name);
 			 if(user_password == store_password){
-				 confirm("登陆成功，是否前往");  //选择弹框
+				 confirm("登陆成功，是否前往");
 				 window.location.href = "https://berlin-blog.github.io";
 				 
 			 } else{
