@@ -17,7 +17,7 @@
         <input type="text" name="reg_name" id="reg_name" class="input" value="" placeholder="User"/>
         <input type="email" placeholder="Email" class="input" placeholder="Email"/>
         <input type="password" name="reg_password" id="reg_password" value="" class="input" placeholder="Password"/>
-        <button class="btn" id="register_btn">Sign Up</button>
+        <button class="btn" id="signUp">Sign Up</button>
       </form>
     </div>
 
@@ -28,7 +28,7 @@
         <input type="text" name="user_name" id="user_name" placeholder="User" class="input" value=""/>
         <input type="password" name="user_password" id="user_password" placeholder="Password" class="input" value=""/>
         <a href="#" class="link">Forgot your password?</a>
-        <button class="btn" id="login>Sign In</button>
+        <button class="btn" id="signIn">Sign In</button>
       </form>
     </div>
 
@@ -46,7 +46,7 @@
   </div>
 <script src="js/entry.js"></script>
 <script type="text/javascript">
-	var register_btn = document.getElementById("register_btn");
+	var register_btn = document.getElementById("signUp");
 	//点击注册触发事件
 	register_btn.addEventListener("click",function(){
 		var user_name = document.getElementById("reg_name").value;
@@ -68,8 +68,8 @@
 </script>
 
 <script type="text/javascript">
-	var login_btn = document.getElementById("login");
-	var register_btn = document.getElementById("register");
+	var login_btn = document.getElementById("signIn");
+	var register_btn = document.getElementById("signUp");
 	//登陆按钮实现
 	login_btn.addEventListener("click",function(){
 		var user_name = document.getElementById("user_name").value;
