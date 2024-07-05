@@ -19,7 +19,7 @@
 
     body {
       align-items: center;
-
+      background-color: var(--white);
       background: url("img/SAO.png");
       background-attachment: fixed;
       background-position: center;
