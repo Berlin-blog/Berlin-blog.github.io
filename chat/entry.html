@@ -78,15 +78,16 @@
 		if(user_nameArr.includes(user_name)){
 			var store_password = localStorage.getItem(user_name);
 			 if(user_password == store_password){
-				 confirm("登陆成功，是否前往");
-				 window.location.href = "https://berlin-blog.github.io";
-				 
+				 var a = confirm("登陆成功，是否前往SAO?");
+				 if(a == true){
+					 window.location.href = "https://berlin-blog.github.io";
+				 }
 			 } else{
-				 document.getElementById("login_sucss").innerHTML = "密码错误！";
+				 alert("密码错误");
 			 }
 		}
 		else{
-			document.getElementById("login_sucss").innerHTML = "用户名不存在!";
+			alert("用户名不存在");
 		}
 	})
 </script>
