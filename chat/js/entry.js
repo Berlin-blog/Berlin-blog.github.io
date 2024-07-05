@@ -1,25 +1,16 @@
-((doc, location) => {
-  const useName = doc.querySelector('#userName')
-  const passWord = doc.querySelector('#passWord')
-  const btn = doc.querySelector('#btn')
+ const signInBtn = document.getElementById("signIn");
+    const signUpBtn = document.getElementById("signUp");
+    const fistForm = document.getElementById("form1");
+    const secondForm = document.getElementById("form2");
+    const container = document.querySelector(".container");
 
-  const init = () => {
-    bindEvent()
-  }
+    signInBtn.addEventListener("click", () => {
+      container.classList.remove("right-panel-active");
+    });
 
-  function bindEvent() {
-    btn.addEventListener('click', handClick, false)
-  }
+    signUpBtn.addEventListener("click", () => {
+      container.classList.add("right-panel-active");
+    });
 
-  function handClick () {
-    // 输入用户名密码
-   console.log('useName', useName, useName.value)
-   console.log('passWord',passWord, passWord.value )
-  //  跳转至聊天室
-   if ( useName.value && passWord.value) {
-    location.href = 'index.html?useName='+ useName.value + '&passWord='+ passWord.value
-   }
-  }
-  init ()
-})(document, location)
-
+    fistForm.addEventListener("submit", (e) => e.preventDefault());
+    secondForm.addEventListener("submit", (e) => e.preventDefault());
