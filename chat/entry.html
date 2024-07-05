@@ -14,10 +14,10 @@
     <div class="container__form container--signup">
       <form action="#" class="form" id="form1">
         <h2 class="form__title">Sign Up</h2>
-        <input type="text" placeholder="User" class="input" />
+        <input type="text" name="reg_name" id="reg_name" class="input" value="" />
         <input type="email" placeholder="Email" class="input" />
-        <input type="password" placeholder="Password" class="input" />
-        <button class="btn">Sign Up</button>
+        <input type="password" name="reg_password" id="reg_password" value="" class="input" />
+        <button class="btn" id="register_btn">Sign Up</button>
       </form>
     </div>
 
@@ -25,10 +25,10 @@
     <div class="container__form container--signin">
       <form action="#" class="form" id="form2">
         <h2 class="form__title">Sign In</h2>
-        <input type="email" placeholder="Email" class="input" />
-        <input type="password" placeholder="Password" class="input" />
+        <input type="text" name="user_name" id="user_name" placeholder="User" class="input" />
+        <input type="password" name="user_password" id="user_password" placeholder="Password" class="input" />
         <a href="#" class="link">Forgot your password?</a>
-        <button class="btn">Sign In</button>
+        <button class="btn" id="login>Sign In</button>
       </form>
     </div>
 
@@ -46,4 +46,54 @@
   </div>
 <script src="js/entry.js"></script>
 </body>
+    	<script type="text/javascript">
+		var register_btn = document.getElementById("register_btn");
+		//点击注册触发事件
+		register_btn.addEventListener("click",function(){
+			var user_name = document.getElementById("reg_name").value;
+			var user_password = document.getElementById("reg_password").value;
+			if(user_name.length == 0||user_password.length ==0){
+				alert("请输入需要注册的用户名或密码！");
+			}
+			//注册成功存入localStorage,并且弹回登录界面
+			else{
+				localStorage.setItem(user_name,user_password);
+				alert("注册成功！正在跳转。。。");
+				//注册完成实现延时跳转登录 
+				//第二种延时跳转
+				setTimeout(function(){
+					window.location.href = "https://berlin.github.io/chat/entry.html";
+				},1000);  //1秒
+			}
+		})
+	</script>
+
+    <script type="text/javascript">
+		var login_btn = document.getElementById("login");
+		var register_btn = document.getElementById("register");
+		//登陆按钮实现
+		login_btn.addEventListener("click",function(){
+			var user_name = document.getElementById("user_name").value;
+			var user_password = document.getElementById("user_assword").value;
+			var user_nameArr = new Array(localStorage.length);
+			//将储存的记录存入数组中
+			for(i=0;i<localStorage.length;i++){
+				user_nameArr[i] = localStorage.key(i);
+			}
+			if(user_nameArr.includes(user_name)){
+				var store_password = localStorage.getItem(user_name);
+				 if(user_password == store_password){
+					 confirm("登陆成功，是否前往");  //选择弹框
+					 window.location.href = "https://berlin.github.io";
+					 
+				 } else{
+					 document.getElementById("login_sucss").innerHTML = "密码错误！";
+				 }
+			}
+			else{
+				document.getElementById("login_sucss").innerHTML = "用户名不存在!";
+			}
+		})
+	</script>
+
 </html>
