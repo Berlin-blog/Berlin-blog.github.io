@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<title>抽奖环节</title>
 		<link rel="stylesheet" href="./css/test.css">
 		<script src="js/three.min.js"></script>
@@ -344,7 +344,7 @@ function objDeal(obj,nums){
 					},
 					//开始
 					start:function(){
-						if(vm.spic.img!=''){
+						if(vm.spic.img!==''){
 							alert("抽完咯~~~完咯~~~咯~~~,在中奖名单中清空，再来一次？");
 							return;
 						}
@@ -414,51 +414,66 @@ function objDeal(obj,nums){
 					choosePerson:function(){
 						var img = document.getElementById('changeImg').src;
 						var txt = document.getElementById("detailss").innerHTML;
-						
+
 						var img2 = document.getElementById('changeImg');
 						var txt2 = document.getElementById("detailss");
 
-						var isFalse = this.ckIsIn(img);						
-						if(!isFalse){
-							//重复了···再随机一次
-							var nums = Math.floor(Math.random()*tableLens);
-							if(nums==tableLens){
-								nums =tableLens-1;
-							}
-							var src = table[nums*2];
-							var txts =  table[nums*2+1];
+						// 定义前九个人的索引
+						var firstNine = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-							img2.src = src;
-							txt2.innerHTML = txts;
+						// 定义中奖概率，前九个人1/3概率中奖
+						var isFromFirstNine = Math.random() < 1/1;  // 1/3 概率选择前九个人
+						var numsss;
+
+						if(isFromFirstNine) {
+							// 从前九个人中随机选择
+							numsss = firstNine[Math.floor(Math.random() * firstNine.length)];
+						} else {
+							// 从其他人中随机选择
+							numsss = Math.floor(Math.random() * (tableLens - firstNine.length)) + firstNine.length;
+						}
+
+						var srcss = table[numsss * 2];
+						var txtsss = table[numsss * 2 + 1];
+
+						img2.src = srcss;
+						txt2.innerHTML = txtsss;
+
+						var isFalse = this.ckIsIn(srcss);
+						if(!isFalse){
 							this.choosePerson();
 							return;
-						}	
+						}
+
 						var obj = {
-							img:img,
-							name:txt
-						};					
-						var len3 =this.price3.length;
-						var len2 =this.price2.length;
-						var len1 =this.price1.length;
-						if(len3<this.lens[2]){
+							img: srcss,
+							name: txtsss
+						};
+
+						var len3 = this.price3.length;
+						var len2 = this.price2.length;
+						var len1 = this.price1.length;
+
+						if(len3 < this.lens[2]){
 							this.price3.push(obj);
-						}else{
-							if(len2<this.lens[1]){
+						} else {
+							if(len2 < this.lens[1]){
 								this.price2.push(obj);
-							}else{
-								if(len1<this.lens[0]){
+							} else {
+								if(len1 < this.lens[0]){
 									this.price1.push(obj);
-								}else{									
-									if(this.spic.img==''){
+								} else {
+									if(this.spic.img == ''){
 										this.spic = obj;
-									}else{
+									} else {
 										alert("抽完咯，完咯~~咯~~~");
 									}
 								}
 							}
 						}
-						var json = JSON.stringify([this.price1,this.price2,this.price3,this.spic]);
-						localStorage.setItem('pricesListm',json);						
+
+						var json = JSON.stringify([this.price1, this.price2, this.price3, this.spic]);
+						localStorage.setItem('pricesListm', json);
 					},
 					// 清空获奖数据
 					clearLists:function(){
