@@ -1,15 +1,745 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>聊天</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f4f4f5; --panel:#fff; --side:#f7f7f7; --primary:#07c160; --primary-d:#06ad56;
+  --text:#1a1a1a; --text2:#595959; --soft:#9aa0a6; --line:#e6e6e6; --line2:#f0f0f0;
+  --hover:#ededed; --active:#dadada; --badge:#fa5151; --warn:#faad14; --radius:8px;
+}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--text); overflow:hidden; -webkit-font-smoothing:antialiased;
+}
+.hidden{display:none!important}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,textarea{font-family:inherit}
+::placeholder{color:#bfbfbf}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#cfcfcf;border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#bbb}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ===== 登录 ===== */
+#login{height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1bd977 0%,var(--primary) 55%,#06a356 100%)}
+.card{background:var(--panel);border-radius:20px;padding:36px 30px 30px;width:340px;box-shadow:0 24px 60px rgba(0,40,20,.35);animation:pop .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{transform:translateY(12px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+.card .logo{font-size:34px;text-align:center;margin-bottom:4px}
+.card h1{text-align:center;font-size:20px;margin-bottom:4px}
+.card .tagline{text-align:center;font-size:13px;color:var(--soft);margin-bottom:20px}
+.card label{display:block;font-size:13px;color:var(--text2);margin:14px 0 6px}
+.card input{width:100%;padding:11px 13px;font-size:15px;border:1px solid var(--line);border-radius:10px;outline:none;transition:border-color .15s,box-shadow .15s,background .15s;background:#fafafa}
+.card input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(7,193,96,.14);background:#fff}
+.primary{width:100%;margin-top:22px;padding:12px;font-size:16px;color:#fff;background:var(--primary);border-radius:11px;transition:background .15s,transform .05s}
+.primary:hover{background:var(--primary-d)}
+.primary:active{transform:translateY(1px)}
+.note{margin-top:16px;font-size:12px;color:var(--soft);line-height:1.7;text-align:center}
+
+/* ===== 应用主框架 ===== */
+#app{display:flex;height:100%}
+/* 侧栏：会话列表 */
+.sidebar{width:300px;flex:0 0 300px;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;position:relative}
+.side-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line2)}
+.me{display:flex;align-items:center;gap:10px;min-width:0}
+.me .avatar{width:36px;height:36px;border-radius:10px;flex:0 0 auto}
+.me-info{display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.me-name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.conn{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--soft)}
+.conn i{width:7px;height:7px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 2px rgba(7,193,96,.18)}
+.conn.connecting i{background:var(--warn);box-shadow:0 0 0 2px rgba(250,173,20,.18);animation:pulse 1s infinite}
+.conn.offline i{background:#bbb;box-shadow:none}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.side-actions{display:flex;gap:6px;position:relative}
+.icon-btn{width:32px;height:32px;border-radius:8px;background:transparent;display:inline-flex;align-items:center;justify-content:center;font-size:18px;color:#555;transition:background .15s}
+.icon-btn:hover{background:var(--hover)}
+.search-box{padding:10px 12px}
+.search-box input{width:100%;padding:8px 12px;font-size:13px;border:1px solid var(--line);border-radius:18px;background:#fff;outline:none;transition:border-color .15s}
+.search-box input:focus{border-color:var(--primary)}
+.conv-list{flex:1;overflow-y:auto;padding:0 8px 10px}
+.conv-item{display:flex;gap:10px;padding:10px 10px;border-radius:10px;cursor:pointer;position:relative;align-items:center;transition:background .12s}
+.conv-item:hover{background:var(--hover)}
+.conv-item.active{background:var(--active)}
+.conv-item .avatar{flex:0 0 auto;width:42px;height:42px;border-radius:10px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;overflow:hidden}
+.conv-item .info{flex:1;min-width:0}
+.conv-item .top-row{display:flex;justify-content:space-between;align-items:center}
+.conv-item .name{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.conv-item .time{font-size:11px;color:var(--soft);flex:0 0 auto;margin-left:8px}
+.conv-item .preview{font-size:12px;color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
+.conv-item .badge{position:absolute;right:10px;bottom:10px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--badge);color:#fff;font-size:11px;line-height:18px;text-align:center;box-shadow:0 1px 4px rgba(250,81,81,.4)}
+.conv-item .del{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:6px;color:#888;font-size:14px;opacity:0;transition:opacity .12s}
+.conv-item:hover .del{opacity:.7}
+.conv-item .del:hover{opacity:1;background:#ddd}
+.empty-side{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--soft);font-size:13px;gap:10px;padding:30px;text-align:center;line-height:1.7}
+.empty-side .big{font-size:44px;opacity:.45}
+
+/* 主区：聊天 */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:#f3f3f3;position:relative}
+.main-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.back-btn{display:none;width:30px;height:30px;border-radius:8px;font-size:20px;align-items:center;justify-content:center;color:#555}
+.back-btn:hover{background:var(--hover)}
+.main-head .mtitle{font-size:16px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.main-head .mtitle:hover{color:var(--primary)}
+.main-head .mstatus{font-size:12px;color:var(--soft);margin-left:4px;flex:0 0 auto}
+.main-head .info-btn{width:30px;height:30px;border-radius:8px;font-size:18px;color:#555;display:inline-flex;align-items:center;justify-content:center}
+.main-head .info-btn:hover{background:var(--hover)}
+.empty-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--soft);gap:12px}
+.empty-main .big{font-size:64px;opacity:.35}
+.empty-main .txt{font-size:14px}
+
+/* 消息 */
+.messages{flex:1;overflow-y:auto;padding:12px 16px 8px;display:flex;flex-direction:column;scroll-behavior:smooth}
+.messages>*:first-child{margin-top:0}
+.msg{display:flex;gap:8px;max-width:100%;margin-top:14px}
+.msg.grp{margin-top:4px}
+.msg.grp .who{display:none}
+.msg.self{flex-direction:row-reverse}
+.avatar{flex:0 0 auto;width:38px;height:38px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;overflow:hidden}
+.bubble-wrap{max-width:72%;display:flex;flex-direction:column;min-width:0}
+.msg.self .bubble-wrap{align-items:flex-end}
+.who{font-size:12px;color:#8590a6;margin:0 4px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bubble{padding:8px 12px;border-radius:var(--radius);font-size:15px;line-height:1.5;word-break:break-word;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.msg.other .bubble{background:#fff;border:1px solid var(--line);border-top-left-radius:3px}
+.msg.self .bubble{background:var(--primary);color:#fff;border-top-right-radius:3px}
+.bubble .text{white-space:pre-wrap}
+.bubble .img-msg{display:block;max-width:200px;max-height:260px;border-radius:8px;cursor:zoom-in}
+.bubble .time{display:block;font-size:10px;margin-top:4px;opacity:.55}
+.time-divider{align-self:center;margin:16px 0 2px;font-size:11px;color:#999;background:rgba(0,0,0,.06);padding:3px 10px;border-radius:8px}
+.sys{align-self:center;margin-top:14px;font-size:12px;color:var(--soft);background:rgba(0,0,0,.05);padding:4px 12px;border-radius:10px}
+.scroll-btn{position:absolute;right:18px;bottom:80px;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.12);font-size:18px;display:flex;align-items:center;justify-content:center;z-index:4}
+.scroll-btn .bd{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--badge);color:#fff;font-size:11px;line-height:18px;text-align:center}
+
+/* 输入栏 */
+.composer{display:flex;align-items:flex-end;gap:8px;padding:10px 14px;background:var(--panel);border-top:1px solid var(--line);position:relative}
+.composer .icon-btn{flex:0 0 auto;color:#666}
+#msgInput{flex:1;padding:9px 14px;font-size:15px;border:1px solid var(--line);border-radius:18px;outline:none;transition:border-color .15s,box-shadow .15s;max-height:96px;resize:none;line-height:1.5}
+#msgInput:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(7,193,96,.12)}
+#msgInput:disabled{background:#f0f0f0}
+#sendBtn{padding:0 16px;height:38px;font-size:15px;color:#fff;background:var(--primary);border-radius:18px}
+#sendBtn:disabled{background:#9ad8b6}
+
+/* 弹层 */
+.popover{position:absolute;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.16);z-index:30}
+#addMenu{top:46px;right:12px;width:150px;padding:6px}
+#addMenu button{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;font-size:14px;color:#333;border-radius:6px;text-align:left}
+#addMenu button:hover{background:#f2f3f5}
+#emojiPanel{bottom:54px;left:14px;width:300px;max-width:84vw;padding:8px}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
+.emoji-grid button{font-size:20px;border-radius:6px;padding:4px}
+.emoji-grid button:hover{background:#eafaf0}
+#membersPanel{top:50px;right:14px;width:200px;max-height:50vh;overflow-y:auto;padding:6px}
+#membersPanel .m{display:flex;align-items:center;gap:8px;padding:7px 6px;border-radius:6px;cursor:pointer}
+#membersPanel .m:hover{background:#f2f3f5}
+#membersPanel .m .avatar{width:28px;height:28px;font-size:12px;border-radius:6px}
+#membersPanel .m .n{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#membersPanel .m .me{color:var(--soft)}
+#membersPanel .m .dot{width:7px;height:7px;border-radius:50%;background:var(--primary);flex:0 0 auto}
+
+/* 模态框 */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:60}
+.modal{background:#fff;border-radius:14px;width:320px;max-width:92vw;padding:20px;box-shadow:0 16px 50px rgba(0,0,0,.3);animation:pop .25s cubic-bezier(.2,.8,.2,1)}
+.modal h3{font-size:16px;margin-bottom:14px}
+.modal .desc{font-size:13px;color:var(--soft);margin-bottom:12px;line-height:1.5}
+.modal input,.modal textarea{width:100%;padding:10px 12px;font-size:14px;border:1px solid var(--line);border-radius:8px;outline:none;margin-bottom:10px}
+.modal input:focus,.modal textarea:focus{border-color:var(--primary)}
+.modal .btns{display:flex;gap:10px;justify-content:flex-end;margin-top:6px}
+.modal .btn{padding:8px 16px;font-size:14px;border-radius:8px}
+.modal .btn.cancel{background:#f2f3f5;color:#333}
+.modal .btn.ok{background:var(--primary);color:#fff}
+.user-pick{max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+.user-pick .u{display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-radius:6px}
+.user-pick .u:hover{background:#f2f3f5}
+.user-pick .u .avatar{width:30px;height:30px;font-size:13px}
+.user-pick .u .n{font-size:14px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-pick .empty{padding:18px;text-align:center;color:var(--soft);font-size:13px}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(30,30,30,.92);color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;z-index:80;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+
+/* 移动端：单栏切换 */
+@media(max-width:680px){
+  .sidebar{position:absolute;left:0;top:0;width:100%;height:100%;z-index:2;transition:transform .25s}
+  .main{position:absolute;left:0;top:0;width:100%;height:100%;z-index:3;transform:translateX(100%);transition:transform .25s}
+  #app.show-chat .main{transform:none}
+  #app.show-chat .sidebar{transform:translateX(-25%)}
+  .back-btn{display:inline-flex}
+  .bubble-wrap{max-width:80%}
+}
+</style>
+
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script>window.mqtt||document.write('<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"><\/script>')</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+<script>window.CryptoJS||document.write('<script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"><\/script>')</script>
 </head>
 <body>
-  <ul id="list"></ul>
-  <input id="message" type="text" placeholder="请输入消息">
-  <button id="send">发送</button>
-  <script src="js/index.js"></script>
+
+<!-- 登录 -->
+<div id="login">
+  <div class="card">
+    <div class="logo">💬</div>
+    <h1>聊天</h1>
+    <p class="tagline">群聊 · 私聊 · 端到端加密口令</p>
+    <label>昵称</label>
+    <input id="nickname" type="text" placeholder="你的昵称" maxlength="16" autocomplete="off" />
+    <label>加密口令 <span style="color:#bbb">（留空=公开网络）</span></label>
+    <input id="key" type="password" placeholder="同口令的人才能互相看到、私聊" autocomplete="off" />
+    <button id="joinBtn" class="primary">进入</button>
+    <p class="note">同口令 = 同一私密网络，互相可见可私聊<br/>基于公共 MQTT 中转，勿发敏感信息</p>
+  </div>
+</div>
+
+<!-- 应用 -->
+<div id="app" class="hidden">
+  <!-- 侧栏 -->
+  <aside class="sidebar">
+    <div class="side-head">
+      <div class="me">
+        <div class="avatar" id="meAvatar"></div>
+        <div class="me-info">
+          <span class="me-name" id="meName"></span>
+          <span class="conn online" id="connDot"><i></i><span id="connTxt">已连接</span></span>
+        </div>
+      </div>
+      <div class="side-actions">
+        <button id="addBtn" class="icon-btn" title="发起聊天">＋</button>
+        <div id="addMenu" class="popover hidden">
+          <button data-act="newGroup">👥 新建群聊</button>
+          <button data-act="joinGroup">📥 加入群聊</button>
+          <button data-act="newDM">✏️ 发起私聊</button>
+        </div>
+      </div>
+    </div>
+    <div class="search-box"><input id="searchInput" type="text" placeholder="搜索会话" /></div>
+    <div id="convList" class="conv-list"></div>
+    <div id="emptySide" class="empty-side hidden"><div class="big">💬</div>点击右上角 ＋ 开始聊天<br/>新建群聊 / 加入群聊 / 发起私聊</div>
+  </aside>
+
+  <!-- 主区 -->
+  <main class="main">
+    <div id="emptyMain" class="empty-main"><div class="big">👈</div>选择一个会话开始聊天</div>
+    <div id="chatPane" class="hidden" style="display:flex;flex-direction:column;height:100%">
+      <div class="main-head">
+        <button class="back-btn" id="backBtn">‹</button>
+        <span id="mTitle" class="mtitle"></span>
+        <span id="mStatus" class="mstatus"></span>
+        <button id="infoBtn" class="info-btn hidden" title="群成员">⋯</button>
+        <div id="membersPanel" class="popover hidden"></div>
+      </div>
+      <div id="messages" class="messages"></div>
+      <button id="scrollBtn" class="scroll-btn hidden">↓<span class="bd hidden">0</span></button>
+      <div class="composer">
+        <button id="emojiBtn" class="icon-btn" title="表情">😀</button>
+        <button id="imgBtn" class="icon-btn" title="图片">🖼</button>
+        <input id="fileInput" type="file" accept="image/*" hidden />
+        <textarea id="msgInput" rows="1" placeholder="输入消息…" maxlength="500" disabled></textarea>
+        <button id="sendBtn" disabled>发送</button>
+        <div id="emojiPanel" class="popover hidden"><div id="emojiGrid" class="emoji-grid"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+<div id="modalRoot"></div>
+
+<script>
+"use strict";
+/* ============================================================
+ *  多会话聊天（群聊 + 私聊），纯前端单文件，公共 MQTT 中转
+ *  主题设计（PREFIX = zcode/chat/v2）：
+ *    presence : PREFIX/presence   全局心跳，发现可私聊的在线用户
+ *    group    : PREFIX/g/<gid>    群聊
+ *    inbox    : PREFIX/u/<uid>    个人收件箱，私聊发到对方的 inbox
+ *  口令 = AES 密钥，加密 presence/group/inbox；同口令才互相可见
+ *  会话/消息持久化于 localStorage（每会话封顶 80 条）
+ * ============================================================ */
+
+var PREFIX = "zcode/chat/v2";
+var BROKER_URL = "wss://broker.emqx.io:8084/mqtt";
+var MAX_IMG = 180000, HEARTBEAT = 15000, PURGE = 40000, MSG_CAP = 80;
+// 默认公共大厅：连接后若没有任何会话，自动加入这里。
+// 口令留空时是真正公开的；有口令时因流量加密，同口令的人才互相可见。
+var DEFAULT_GROUP_ID = "public_hall", DEFAULT_GROUP_NAME = "公共大厅";
+
+// ---------- DOM ----------
+function $(id){ return document.getElementById(id); }
+var loginView=$("login"), appEl=$("app");
+var nicknameInput=$("nickname"), keyInput=$("key"), joinBtn=$("joinBtn");
+var convListEl=$("convList"), emptySide=$("emptySide"), searchInput=$("searchInput");
+var addBtn=$("addBtn"), addMenu=$("addMenu");
+var emptyMain=$("emptyMain"), chatPane=$("chatPane");
+var backBtn=$("backBtn"), mTitle=$("mTitle"), mStatusEl=$("mStatus"), infoBtn=$("infoBtn"), membersPanel=$("membersPanel");
+var messagesEl=$("messages"), scrollBtn=$("scrollBtn"), scrollBd=scrollBtn.querySelector(".bd");
+var emojiBtn=$("emojiBtn"), emojiPanel=$("emojiPanel"), emojiGrid=$("emojiGrid");
+var imgBtn=$("imgBtn"), fileInput=$("fileInput");
+var msgInput=$("msgInput"), sendBtn=$("sendBtn");
+var toastEl=$("toast"), modalRoot=$("modalRoot");
+var meAvatarEl=$("meAvatar"), meNameEl=$("meName"), connDotEl=$("connDot"), connTxtEl=$("connTxt");
+
+// ---------- 状态 ----------
+var SID = rand(12);
+var UID = lsGet("chat.uid") || (function(){ var u="u_"+rand(10); lsSet("chat.uid",u); return u; })();
+var nick = lsGet("chat.nick") || "";
+var key = "";
+var client=null, ready=false, isFirstConnect=true;
+var roster = new Map();            // uid -> {nick,last}
+var convs = loadConvs();           // [{id,type,name,ref}]
+var msgs = {};                     // convId -> [msg]
+var activeId = null;               // 当前会话 id
+var groupMembers = {};             // groupId -> Map(uid->nick)
+var hbTimer=null, purgeTimer=null;
+var pendingGroup = null, pendingGroupName = null;
+
+// 预填昵称
+if(nick) nicknameInput.value = nick;
+// URL ?group=&gn=&key= 预填
+(function readUrl(){
+  var p = new URLSearchParams(location.search);
+  if(p.get("key")) keyInput.value = p.get("key");
+  if(p.get("group")){ pendingGroup = p.get("group"); pendingGroupName = p.get("gn") || ("群聊 "+p.get("group").slice(-4)); }
+})();
+
+// ---------- 工具 ----------
+function rand(n){ return Math.random().toString(36).slice(2,2+(n||8)); }
+function lsGet(k){ try{return localStorage.getItem(k);}catch(e){return null;} }
+function lsSet(k,v){ try{localStorage.setItem(k,v);}catch(e){} }
+function topicPresence(){ return PREFIX+"/presence"; }
+function topicGroup(gid){ return PREFIX+"/g/"+gid; }
+function topicInbox(uid){ return PREFIX+"/u/"+uid; }
+function groupIdOf(conv){ return conv.ref; }
+function peerUidOf(conv){ return conv.ref; }
+function dmId(a,b){ return "d_"+[a,b].sort().join("_"); }
+function gidToConvId(gid){ return "g_"+gid; }
+function avatarColor(name){ var h=0; for(var i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0; return "hsl("+(h%360)+",58%,52%)"; }
+function avatarInitial(name){ return ([...name][0]||"?").toUpperCase(); }
+function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function fmtTime(ts){ var d=new Date(ts); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+function fmtDay(ts){ var d=new Date(ts),n=new Date(); if(d.toDateString()===n.toDateString()) return fmtTime(ts); return (d.getMonth()+1)+"/"+d.getDate(); }
+function isNearBottom(){ return messagesEl.scrollHeight-messagesEl.scrollTop-messagesEl.clientHeight<100; }
+function scrollToBottom(){ messagesEl.scrollTop=messagesEl.scrollHeight; }
+var toastT=null;
+function toast(t){ toastEl.textContent=t; toastEl.classList.remove("hidden"); clearTimeout(toastT); toastT=setTimeout(function(){toastEl.classList.add("hidden");},1800); }
+function insertAtCursor(input,text){ var s=input.selectionStart||0,e=input.selectionEnd||0; input.value=input.value.slice(0,s)+text+input.value.slice(e); input.selectionStart=input.selectionEnd=s+text.length; input.focus(); }
+
+// ---------- 加解密 ----------
+function enc(s){ return key?CryptoJS.AES.encrypt(s,key).toString():s; }
+function dec(s){ if(!key) return s; try{ return CryptoJS.AES.decrypt(s,key).toString(CryptoJS.enc.Utf8); }catch(e){ return null; } }
+
+// ---------- 持久化 ----------
+function loadConvs(){ try{ return JSON.parse(lsGet("chat.convs")||"[]"); }catch(e){ return []; } }
+function saveConvs(){ lsSet("chat.convs", JSON.stringify(convs)); }
+function loadMsgs(id){ try{ msgs[id]=JSON.parse(lsGet("chat.msg."+id)||"[]"); }catch(e){ msgs[id]=[]; } return msgs[id]; }
+function saveMsgs(id){ try{ lsSet("chat.msg."+id, JSON.stringify((msgs[id]||[]).slice(-MSG_CAP))); }catch(e){} }
+function findConv(id){ return convs.find(function(c){return c.id===id;}); }
+
+// ---------- 登录 ----------
+joinBtn.addEventListener("click", enter);
+nicknameInput.addEventListener("keydown", function(e){ if(e.key==="Enter") enter(); });
+keyInput.addEventListener("keydown", function(e){ if(e.key==="Enter") enter(); });
+function enter(){
+  nick = nicknameInput.value.trim();
+  if(!nick){ nicknameInput.focus(); return; }
+  key = keyInput.value.trim();
+  // 昵称变化视为换了一个用户：重置身份并清空历史，避免串用上一个用户的消息记录
+  var oldNick = lsGet("chat.nick");
+  if(oldNick && oldNick !== nick){
+    UID = "u_" + rand(10); lsSet("chat.uid", UID);
+    convs = []; saveConvs(); msgs = {}; unread = {}; activeId = null; groupMembers = {};
+    try{ Object.keys(localStorage).forEach(function(k){ if(k.indexOf("chat.msg.")===0) localStorage.removeItem(k); }); }catch(e){}
+  }
+  lsSet("chat.nick", nick);
+  renderMe();
+  // 写入 URL（保留 group/gn，去掉 nick）
+  var u=new URL(location.href); u.searchParams.delete("nick"); if(key) u.searchParams.set("key",key); history.replaceState(null,"",u.toString());
+  loginView.classList.add("hidden"); appEl.classList.remove("hidden");
+  connect();
+}
+
+// ---------- MQTT 连接 ----------
+function connect(){
+  if(!window.mqtt){ toast("MQTT 库加载失败，请检查网络后刷新"); return; }
+  roster = new Map(); roster.set(UID,{nick:nick,last:Date.now()});
+  isFirstConnect = true;
+  setConn("connecting");
+  client = mqtt.connect(BROKER_URL,{clientId:"chat_"+rand(8),clean:true,reconnectPeriod:3000,connectTimeout:8000});
+  client.on("connect", function(){
+    client.subscribe([topicPresence(), topicInbox(UID)], function(err){
+      if(err){ toast("订阅失败"); return; }
+      // 订阅所有已有群聊
+      var groupTopics = convs.filter(function(c){return c.type==="group";}).map(function(c){return topicGroup(c.ref);});
+      if(groupTopics.length) client.subscribe(groupTopics);
+      ready = true;
+      setConn("online");
+      publish(topicPresence(), {t:"presence"});
+      // 心跳与清理定时器：重连前先清掉旧的，避免泄漏
+      if(hbTimer) clearInterval(hbTimer);
+      if(purgeTimer) clearInterval(purgeTimer);
+      hbTimer = setInterval(function(){ roster.get(UID).last=Date.now(); publish(topicPresence(),{t:"presence"}); }, HEARTBEAT);
+      purgeTimer = setInterval(purgeStale, 10000);
+      // 只在首次连接给一条系统提示，避免网络抖动时刷屏
+      if(isFirstConnect){
+        isFirstConnect = false;
+        if(pendingGroup){ var gid=pendingGroup, gn=pendingGroupName; pendingGroup=null; joinGroup(gid,gn); }
+        else if(convs.length===0){ joinGroup(DEFAULT_GROUP_ID, DEFAULT_GROUP_NAME); } // 首次进入默认进公共大厅
+      }
+      // 重连成功后恢复当前会话的输入状态（断线时被禁用了）
+      if(activeId){ msgInput.disabled=false; sendBtn.disabled=false; updateMainStatus(); }
+      renderConvList();
+    });
+  });
+  client.on("message", function(topic, payload){
+    var s = dec(payload.toString()); if(s===null) return;
+    var data; try{ data=JSON.parse(s); }catch(e){ return; }
+    route(topic, data);
+  });
+  client.on("close", function(){ ready=false; msgInput.disabled=true; sendBtn.disabled=true; setConn("offline"); });
+  client.on("reconnect", function(){ setConn("connecting"); });
+  client.on("error", function(err){ console.error(err); });
+}
+
+function publish(topic, obj){ obj.sid=SID; obj.uid=UID; obj.nick=nick; obj.time=Date.now(); client.publish(topic, enc(JSON.stringify(obj))); }
+
+// ---------- 消息路由 ----------
+function route(topic, data){
+  if(topic===topicPresence()){ handlePresence(data); return; }
+  if(topic===topicInbox(UID)){ handleInbox(data); return; }
+  // 群聊主题
+  if(topic.indexOf(PREFIX+"/g/")===0){ handleGroup(topic.slice(PREFIX.length+3), data); return; }
+}
+
+// presence：更新在线名单
+function handlePresence(data){
+  if(data.uid===UID) return;
+  var isNew = !roster.has(data.uid);
+  roster.set(data.uid, {nick:data.nick, last:Date.now()});
+  // 握手回发：收到新用户时立即回一条 presence，让双方快速互相发现
+  if(isNew && ready){ publish(topicPresence(), {t:"presence"}); }
+  // 更新当前会话的状态与已打开的群成员面板
+  if(activeId){ var c=findConv(activeId); if(c){ updateMainStatus(); if(c.type==="group" && !membersPanel.classList.contains("hidden")) renderMembers(c.ref); } }
+}
+// 收件箱：收到私聊消息
+function handleInbox(data){
+  if(data.sid===SID) return; // 自己回环
+  if(data.t==="msg"){
+    var cid = dmId(UID, data.uid);
+    var conv = findConv(cid);
+    if(!conv){ conv = {id:cid, type:"dm", name:data.nick, ref:data.uid}; convs.unshift(conv); saveConvs(); loadMsgs(cid); renderConvList(); }
+    pushMsg(cid, {self:false, uid:data.uid, nick:data.nick, mime:data.mime, body:data.body, time:data.time});
+  }
+}
+// 群聊主题
+function handleGroup(gid, data){
+  if(data.sid===SID && data.t!=="join") return; // 自己发的非join消息不回环
+  var cid = gidToConvId(gid);
+  // 维护群成员
+  if(!groupMembers[gid]) groupMembers[gid] = new Map();
+  if(data.uid){ groupMembers[gid].set(data.uid, data.nick); if(activeId===cid && !membersPanel.classList.contains("hidden")) renderMembers(gid); }
+  if(data.t==="join"){
+    // 若我们尚未建立该会话但收到了（理论上不会，因为需订阅）；忽略
+    if(findConv(cid) && data.uid!==UID) addSystem(cid, data.nick+" 加入了群聊");
+    // 用携带的 gn 给匿名会话命名
+    if(data.gn){ var c=findConv(cid); if(c && c.name.indexOf("群聊 ")===0){ c.name=data.gn; saveConvs(); renderConvList(); if(activeId===cid) mTitle.textContent=c.name; } }
+    return;
+  }
+  if(data.t==="msg"){
+    var conv = findConv(cid);
+    if(!conv) return; // 未加入的群不显示
+    pushMsg(cid, {self:false, uid:data.uid, nick:data.nick, mime:data.mime, body:data.body, time:data.time});
+  }
+}
+
+// ---------- 在线清理 ----------
+function purgeStale(){
+  var now=Date.now(), changed=false;
+  roster.forEach(function(info,uid){ if(uid!==UID && now-info.last>PURGE){ roster.delete(uid); changed=true; } });
+  if(changed && activeId){ var c=findConv(activeId); if(c){ updateMainStatus(); if(c.type==="group" && !membersPanel.classList.contains("hidden")) renderMembers(c.ref); } }
+}
+
+// ---------- 消息存储与渲染 ----------
+function pushMsg(cid, m){
+  if(!msgs[cid]) loadMsgs(cid);
+  msgs[cid].push(m); msgs[cid] = msgs[cid].slice(-MSG_CAP); saveMsgs(cid);
+  // 更新会话顺序与预览
+  var c = findConv(cid); if(c){ moveTop(cid); }
+  if(activeId===cid){
+    var arr=msgs[cid]; var prev=arr.length>=2?arr[arr.length-2]:null;
+    renderMessage(m, msgOpts(prev, m));
+  }
+  else { bumpUnread(cid); renderConvList(); }
+}
+function moveTop(cid){ var i=convs.findIndex(function(c){return c.id===cid;}); if(i>0){ var c=convs.splice(i,1)[0]; convs.unshift(c); saveConvs(); } }
+var unread = {};
+function bumpUnread(cid){ unread[cid]=(unread[cid]||0)+1; }
+function lastPreview(cid){ var arr=msgs[cid]||[]; if(!arr.length) return ""; var m=arr[arr.length-1]; if(m.sys) return m.body; var self = m.uid?(m.uid===UID):m.self; var who = self?"":((m.nick||"?")+": "); return m.mime==="image"?"[图片]":who+(m.mime==="image"?"[图片]":m.body); }
+function lastTime(cid){ var arr=msgs[cid]||[]; return arr.length?arr[arr.length-1].time:0; }
+
+function addSystem(cid, text){ pushMsg(cid,{self:false,sys:true,body:text,time:Date.now()}); }
+function addSystemAll(text){ if(activeId) addSystem(activeId, text); }
+
+// 消息分组与时间分隔：连续同人≤3min 归为一组（隐藏昵称、缩小间距）；间隔>5min 插时间条
+function senderKey(m){ if(m.sys) return null; return m.uid || (m.self?UID:"?"); }
+function msgOpts(prev, m){
+  var grouped=false, divider=null;
+  if(m.sys) return {grouped:false, divider:null};
+  if(prev){
+    if(!prev.sys && senderKey(prev)===senderKey(m) && (m.time-prev.time)<180000) grouped=true;
+    if(prev.sys || (m.time-prev.time)>300000) divider=fmtTime(m.time);
+  } else { divider=fmtTime(m.time); }
+  return {grouped:grouped, divider:divider};
+}
+// 连接状态可视化（侧栏头像下方的小圆点）
+function setConn(state){ connDotEl.className="conn "+state; connTxtEl.textContent={online:"已连接",connecting:"连接中…",offline:"网络断开"}[state]||""; }
+function renderMe(){ meNameEl.textContent=nick; meAvatarEl.style.background=avatarColor(nick); meAvatarEl.textContent=avatarInitial(nick); }
+
+function renderMessage(m, opts){
+  opts = opts || {};
+  if(opts.divider){ var dv=document.createElement("div"); dv.className="time-divider"; dv.textContent=opts.divider; messagesEl.appendChild(dv); }
+  if(m.sys){ var e=document.createElement("div"); e.className="sys"; e.textContent=m.body; messagesEl.appendChild(e); scrollToBottom(); return; }
+  var self = m.uid ? (m.uid===UID) : m.self; // 按 uid 动态判断自己/他人，避免历史串用
+  var row=document.createElement("div"); row.className="msg "+(self?"self":"other")+(opts.grouped?" grp":"");
+  var av=document.createElement("div"); av.className="avatar"; av.style.background=avatarColor(self?nick:m.nick); av.textContent=avatarInitial(self?nick:m.nick); row.appendChild(av);
+  var wrap=document.createElement("div"); wrap.className="bubble-wrap";
+  if(!self && !opts.grouped){ var w=document.createElement("div"); w.className="who"; w.textContent=m.nick; wrap.appendChild(w); }
+  var bub=document.createElement("div"); bub.className="bubble";
+  if(m.mime==="image"){ var im=document.createElement("img"); im.className="img-msg"; im.src=m.body; im.addEventListener("click",function(){window.open(m.body,"_blank");}); bub.appendChild(im); }
+  else { var tx=document.createElement("span"); tx.className="text"; tx.textContent=m.body; bub.appendChild(tx); }
+  wrap.appendChild(bub);
+  var t=document.createElement("div"); t.className="time"; t.textContent=fmtTime(m.time); wrap.appendChild(t);
+  row.appendChild(wrap);
+  var near=isNearBottom(); messagesEl.appendChild(row); if(near) scrollToBottom(); else showScrollBadge(1);
+}
+function renderActiveMessages(){
+  messagesEl.innerHTML="";
+  var arr=msgs[activeId]||[]; var prev=null;
+  arr.forEach(function(m){ renderMessage(m, msgOpts(prev, m)); prev=m; });
+  scrollToBottom(); hideScrollBadge();
+}
+
+// ---------- 会话列表渲染 ----------
+function renderConvList(){
+  var q = (searchInput.value||"").trim().toLowerCase();
+  convListEl.innerHTML="";
+  var shown=0;
+  convs.forEach(function(c){
+    if(q && c.name.toLowerCase().indexOf(q)<0) return;
+    shown++;
+    var item=document.createElement("div"); item.className="conv-item"+(c.id===activeId?" active":""); item.dataset.id=c.id;
+    var av=document.createElement("div"); av.className="avatar";
+    if(c.type==="group"){ av.style.background="#7a8aa6"; av.innerHTML="👥"; }
+    else { av.style.background=avatarColor(c.name); av.textContent=avatarInitial(c.name); }
+    item.appendChild(av);
+    var info=document.createElement("div"); info.className="info";
+    var top=document.createElement("div"); top.className="top-row";
+    var nm=document.createElement("span"); nm.className="name"; nm.textContent=c.name; top.appendChild(nm);
+    var lt=lastTime(c.id); if(lt){ var tm=document.createElement("span"); tm.className="time"; tm.textContent=fmtDay(lt); top.appendChild(tm); }
+    info.appendChild(top);
+    var pv=document.createElement("div"); pv.className="preview"; pv.textContent=lastPreview(c.id); info.appendChild(pv);
+    item.appendChild(info);
+    if(unread[c.id]){ var b=document.createElement("span"); b.className="badge"; b.textContent=unread[c.id]>99?"99+":unread[c.id]; item.appendChild(b); }
+    var del=document.createElement("button"); del.className="del"; del.title="删除会话"; del.textContent="×";
+    del.addEventListener("click", function(e){ e.stopPropagation(); deleteConv(c.id); });
+    item.appendChild(del);
+    item.addEventListener("click", function(){ openConv(c.id); });
+    convListEl.appendChild(item);
+  });
+  emptySide.classList.toggle("hidden", convs.length>0);
+  if(convs.length>0 && shown===0 && q){ var e=document.createElement("div"); e.className="empty-side"; e.style.display="flex"; e.innerHTML='<div>无匹配会话</div>'; convListEl.appendChild(e); }
+}
+
+function deleteConv(id){
+  var c=findConv(id); if(!c) return;
+  if(!confirm("删除会话「"+c.name+"」？\n（群聊将退出，消息记录会清除）")) return;
+  convs = convs.filter(function(x){return x.id!==id;});
+  try{ localStorage.removeItem("chat.msg."+id); }catch(e){}
+  delete msgs[id]; delete unread[id];
+  if(c.type==="group" && client && ready){ try{ client.unsubscribe(topicGroup(c.ref)); }catch(e){} }
+  if(activeId===id){ activeId=null; showEmptyMain(); }
+  saveConvs(); renderConvList();
+}
+
+// ---------- 打开会话 ----------
+function openConv(id){
+  var c=findConv(id); if(!c) return;
+  activeId=id; unread[id]=0;
+  appEl.classList.add("show-chat");
+  emptyMain.classList.add("hidden"); chatPane.classList.remove("hidden");
+  mTitle.textContent=c.name;
+  updateMainStatus();
+  infoBtn.classList.toggle("hidden", c.type!=="group");
+  if(!msgs[id]) loadMsgs(id);
+  renderActiveMessages();
+  renderConvList();
+  // 进入群聊时广播 join（携带群名，帮他人命名）
+  if(c.type==="group" && ready){ publish(topicGroup(c.ref), {t:"join", gn:c.name}); }
+  // 启用输入
+  msgInput.disabled=!ready; sendBtn.disabled=!ready; msgInput.focus();
+}
+function showEmptyMain(){ emptyMain.classList.remove("hidden"); chatPane.classList.add("hidden"); appEl.classList.remove("show-chat"); infoBtn.classList.add("hidden"); }
+function updateMainStatus(){
+  if(!activeId) return; var c=findConv(activeId); if(!c) return;
+  if(c.type==="dm"){ var online=roster.has(c.ref); mStatusEl.textContent=online?"在线":"离线"; mStatusEl.style.color=online?"var(--primary)":"var(--soft)"; }
+  else { var n=roster.size; mStatusEl.textContent=n+" 人在线"; mStatusEl.style.color="var(--soft)"; }
+}
+
+// ---------- 发送 ----------
+sendBtn.addEventListener("click", sendMessage);
+msgInput.addEventListener("keydown", function(e){
+  if(e.key==="Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); sendMessage(); }
+});
+msgInput.addEventListener("input", function(){ msgInput.style.height="auto"; msgInput.style.height=Math.min(msgInput.scrollHeight,96)+"px"; });
+function sendMessage(){
+  var text=msgInput.value.trim(); if(!text||!ready||!activeId) return;
+  var c=findConv(activeId); if(!c) return;
+  if(c.type==="group"){ publish(topicGroup(c.ref), {t:"msg", mime:"text", body:text}); }
+  else { publish(topicInbox(c.ref), {t:"msg", mime:"text", body:text}); }
+  pushMsg(activeId, {self:true, uid:UID, nick:nick, mime:"text", body:text, time:Date.now()});
+  msgInput.value=""; msgInput.style.height="auto"; renderConvList();
+}
+
+// ---------- 滚动按钮 ----------
+function showScrollBadge(n){ scrollBtn.classList.remove("hidden"); var v=(parseInt(scrollBd.textContent,10)||0)+n; scrollBd.textContent=v>99?"99+":v; scrollBd.classList.remove("hidden"); }
+function hideScrollBadge(){ scrollBtn.classList.add("hidden"); scrollBd.classList.add("hidden"); scrollBd.textContent="0"; }
+messagesEl.addEventListener("scroll", function(){ if(isNearBottom()) hideScrollBadge(); });
+scrollBtn.addEventListener("click", function(){ hideScrollBadge(); scrollToBottom(); });
+
+// ---------- 表情 ----------
+var EMOJIS=["😀","😁","😂","🤣","😃","😄","😅","😆","😉","😊","😋","😎","😍","😘","🙂","🤗","🤔","😐","😶","🙄","😏","😴","🤤","😪","🤐","🤒","🤕","🤧","😷","👍","👎","👏","🙌","🙏","💪","🔥","❤️","💔","🎉","🥳","😇","🤩","😌","😢","😭","😮","😱"];
+(function(){ var h=""; EMOJIS.forEach(function(e){h+='<button type="button">'+e+"</button>";}); emojiGrid.innerHTML=h;
+  emojiGrid.addEventListener("click", function(ev){ var b=ev.target.closest("button"); if(!b)return; insertAtCursor(msgInput,b.textContent); emojiPanel.classList.add("hidden"); msgInput.focus(); }); })();
+emojiBtn.addEventListener("click", function(e){ e.stopPropagation(); closePopups([emojiPanel]); emojiPanel.classList.toggle("hidden"); });
+
+// ---------- 图片 ----------
+imgBtn.addEventListener("click", function(){ if(!activeId) return; fileInput.click(); });
+fileInput.addEventListener("change", function(){
+  var f=fileInput.files&&fileInput.files[0]; fileInput.value=""; if(!f||!ready||!activeId) return;
+  if(!/^image\//.test(f.type)){ toast("请选择图片"); return; }
+  compressImage(f).then(function(url){ if(!url){ toast("图片过大，无法发送"); return; }
+    var c=findConv(activeId); if(!c) return;
+    if(c.type==="group") publish(topicGroup(c.ref),{t:"msg",mime:"image",body:url});
+    else publish(topicInbox(c.ref),{t:"msg",mime:"image",body:url});
+    pushMsg(activeId,{self:true,uid:UID,nick:nick,mime:"image",body:url,time:Date.now()});
+    renderConvList();
+  }).catch(function(){ toast("图片处理失败"); });
+});
+function fileToDataURL(f){ return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){res(r.result);}; r.onerror=rej; r.readAsDataURL(f); }); }
+function loadImage(s){ return new Promise(function(res,rej){ var im=new Image(); im.onload=function(){res(im);}; im.onerror=rej; im.src=s; }); }
+function scaleDraw(img,maxDim,q){ var w=img.width,h=img.height; if(w>maxDim||h>maxDim){ if(w>h){h=Math.round(h*maxDim/w);w=maxDim;}else{w=Math.round(w*maxDim/h);h=maxDim;} } var c=document.createElement("canvas"); c.width=w;c.height=h; c.getContext("2d").drawImage(img,0,0,w,h); return c.toDataURL("image/jpeg",q); }
+function compressImage(f){ return fileToDataURL(f).then(loadImage).then(function(img){ var maxDim=1280,q=0.8,url; for(var i=0;i<8;i++){ url=scaleDraw(img,maxDim,q); if(url.length<=MAX_IMG) return url; if(q>0.45){q-=0.15;}else{maxDim=Math.floor(maxDim*0.8);q=0.8;} } return url.length<=MAX_IMG?url:null; }); }
+
+// ---------- + 菜单 ----------
+addBtn.addEventListener("click", function(e){ e.stopPropagation(); closePopups([addMenu]); addMenu.classList.toggle("hidden"); });
+addMenu.addEventListener("click", function(e){ var b=e.target.closest("button"); if(!b)return; addMenu.classList.add("hidden"); var act=b.dataset.act;
+  if(act==="newGroup") modalNewGroup();
+  else if(act==="joinGroup") modalJoinGroup();
+  else if(act==="newDM") modalNewDM();
+});
+function closePopups(except){ [addMenu,emojiPanel,membersPanel].forEach(function(p){ if(!(except||[]).includes(p)) p.classList.add("hidden"); }); }
+document.addEventListener("click", function(){ closePopups([]); });
+[addMenu,emojiPanel,membersPanel].forEach(function(p){ p.addEventListener("click", function(e){ e.stopPropagation(); }); });
+
+// ---------- 群聊：创建 / 加入 ----------
+function newGroup(name){
+  var gid = "g_"+rand(8);
+  var conv = {id:gidToConvId(gid), type:"group", name:name||("群聊 "+gid.slice(-4)), ref:gid};
+  convs.unshift(conv); saveConvs(); loadMsgs(conv.id);
+  if(client&&ready) client.subscribe(topicGroup(gid));
+  addSystem(conv.id, "你创建了群聊「"+conv.name+"」");
+  renderConvList(); openConv(conv.id);
+  shareGroupLink(gid, conv.name);
+}
+function joinGroup(gid, gn){
+  var cid=gidToConvId(gid);
+  if(findConv(cid)){ openConv(cid); toast("已在群聊中"); return; }
+  var conv={id:cid, type:"group", name:gn||("群聊 "+gid.slice(-4)), ref:gid};
+  convs.unshift(conv); saveConvs(); loadMsgs(cid);
+  if(client&&ready) client.subscribe(topicGroup(gid));
+  addSystem(cid, "你加入了群聊");
+  if(ready) publish(topicGroup(gid), {t:"join", gn:conv.name});
+  renderConvList(); openConv(cid);
+}
+function shareGroupLink(gid, gn){
+  var u=new URL(location.href); u.searchParams.set("group",gid); u.searchParams.set("gn",gn||""); if(key)u.searchParams.set("key",key); u.searchParams.delete("nick");
+  var link=u.toString();
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(function(){ toast("群邀请链接已复制，可分享给好友"); }, function(){ toast("链接："+link); }); }
+  else toast("邀请链接："+link);
+}
+
+// ---------- 私聊：发起 ----------
+function startDM(peerUid, peerNick){
+  var cid=dmId(UID, peerUid);
+  var conv=findConv(cid);
+  if(!conv){ conv={id:cid, type:"dm", name:peerNick, ref:peerUid}; convs.unshift(conv); saveConvs(); loadMsgs(cid); }
+  renderConvList(); openConv(cid);
+}
+
+// ---------- 群成员面板 ----------
+infoBtn.addEventListener("click", function(e){ e.stopPropagation(); if(!activeId) return; var c=findConv(activeId); if(!c||c.type!=="group")return; renderMembers(c.ref); membersPanel.classList.toggle("hidden"); closePopups([membersPanel]); });
+function renderMembers(gid){
+  // 合并“群内已知成员”与“全局在线名单(roster)”：公共大厅里能看到所有在线用户并私聊
+  var seen = new Map();
+  var gm = groupMembers[gid] || new Map();
+  gm.forEach(function(nickk,uidd){ seen.set(uidd, {nick:nickk, online: roster.has(uidd)}); });
+  roster.forEach(function(info,uidd){ if(!seen.has(uidd)) seen.set(uidd, {nick:info.nick, online:true}); });
+  if(!seen.has(UID)) seen.set(UID, {nick:nick, online:true});
+  var arr=[]; seen.forEach(function(v,uidd){ arr.push({uid:uidd,nick:v.nick,online:v.online||uidd===UID}); });
+  arr.sort(function(a,b){return a.nick.localeCompare(b.nick);});
+  var h=""; arr.forEach(function(x){ var me=x.uid===UID; h+='<div class="m" data-uid="'+escapeHtml(x.uid)+'" data-nick="'+escapeHtml(x.nick)+'"><div class="avatar" style="background:'+avatarColor(x.nick)+'">'+avatarInitial(x.nick)+'</div><span class="n">'+escapeHtml(x.nick)+(me?'<span class="me"> (我)</span>':'')+'</span>'+(me?'':'<span class="dot" title="在线"></span>')+'</div>'; });
+  membersPanel.innerHTML=h;
+}
+membersPanel.addEventListener("click", function(e){ var m=e.target.closest(".m"); if(!m)return; var uid=m.dataset.uid, n=m.dataset.nick; membersPanel.classList.add("hidden"); if(uid!==UID) startDM(uid,n); });
+
+// ---------- 顶部标题：重命名 ----------
+mTitle.addEventListener("click", function(){ if(!activeId)return; var c=findConv(activeId); if(!c)return; modalRename(c); });
+
+// ---------- 返回（移动端） ----------
+backBtn.addEventListener("click", function(){ appEl.classList.remove("show-chat"); });
+
+// ---------- 搜索 ----------
+searchInput.addEventListener("input", renderConvList);
+
+// ---------- 模态框 ----------
+function modal(html, onMount){ modalRoot.innerHTML='<div class="modal-mask"><div class="modal">'+html+'</div></div>'; var mask=modalRoot.querySelector(".modal-mask"); if(onMount) onMount(mask); }
+function closeModal(){ modalRoot.innerHTML=""; }
+function modalNewGroup(){
+  modal('<h3>新建群聊</h3><div class="desc">创建后将自动生成邀请链接，分享给好友即可加入。</div><input id="m_gname" type="text" placeholder="群名称（如：项目组）" maxlength="20" /><div class="btns"><button class="btn cancel" data-act="cancel">取消</button><button class="btn ok" data-act="ok">创建</button></div>',
+  function(mask){ var inp=mask.querySelector("#m_gname"); inp.focus();
+    mask.querySelector('[data-act=cancel]').onclick=function(){closeModal();};
+    mask.querySelector('[data-act=ok]').onclick=function(){ var n=inp.value.trim(); if(!n){inp.focus();return;} closeModal(); newGroup(n); };
+    inp.addEventListener("keydown",function(e){ if(e.key==="Enter") mask.querySelector('[data-act=ok]').click(); });
+  });
+}
+function modalJoinGroup(){
+  modal('<h3>加入群聊</h3><div class="desc">输入群号加入；或让对方发你邀请链接，打开即可。</div><input id="m_gid" type="text" placeholder="群号" maxlength="40" /><input id="m_gn" type="text" placeholder="群名称（可选）" maxlength="20" /><div class="btns"><button class="btn cancel" data-act="cancel">取消</button><button class="btn ok" data-act="ok">加入</button></div>',
+  function(mask){ mask.querySelector('[data-act=cancel]').onclick=function(){closeModal();};
+    mask.querySelector('[data-act=ok]').onclick=function(){ var g=mask.querySelector("#m_gid").value.trim(); if(!g){mask.querySelector("#m_gid").focus();return;} var gn=mask.querySelector("#m_gn").value.trim(); closeModal(); joinGroup(g,gn); };
+    mask.querySelector("#m_gid").addEventListener("keydown",function(e){ if(e.key==="Enter") mask.querySelector('[data-act=ok]').click(); });
+  });
+}
+function modalNewDM(){
+  // 在线用户列表
+  var list=[]; roster.forEach(function(info,uid){ if(uid!==UID) list.push({uid:uid,nick:info.nick}); }); list.sort(function(a,b){return a.nick.localeCompare(b.nick);});
+  var inner = list.length ? list.map(function(x){ return '<div class="u" data-uid="'+escapeHtml(x.uid)+'" data-nick="'+escapeHtml(x.nick)+'"><div class="avatar" style="background:'+avatarColor(x.nick)+'">'+avatarInitial(x.nick)+'</div><span class="n">'+escapeHtml(x.nick)+'</span><span class="dot" style="width:7px;height:7px;border-radius:50%;background:var(--primary)"></span></div>'; }).join("") : '<div class="empty">暂无其他在线用户<br/>（需同口令）</div>';
+  modal('<h3>发起私聊</h3><div class="desc">选择一位在线用户开始私聊。</div><div class="user-pick">'+inner+'</div><div class="btns"><button class="btn cancel" data-act="cancel">关闭</button></div>',
+  function(mask){ mask.querySelector('[data-act=cancel]').onclick=function(){closeModal();};
+    mask.querySelectorAll(".u").forEach(function(u){ u.onclick=function(){ var uid=u.dataset.uid, n=u.dataset.nick; closeModal(); startDM(uid,n); }; });
+  });
+}
+function modalRename(conv){
+  modal('<h3>重命名</h3><input id="m_name" type="text" value="'+escapeHtml(conv.name)+'" maxlength="24" /><div class="btns"><button class="btn cancel" data-act="cancel">取消</button><button class="btn ok" data-act="ok">保存</button></div>',
+  function(mask){ var inp=mask.querySelector("#m_name"); inp.focus(); inp.select();
+    mask.querySelector('[data-act=cancel]').onclick=function(){closeModal();};
+    mask.querySelector('[data-act=ok]').onclick=function(){ var n=inp.value.trim(); if(!n){inp.focus();return;} conv.name=n; saveConvs(); renderConvList(); if(activeId===conv.id) mTitle.textContent=n; closeModal(); };
+    inp.addEventListener("keydown",function(e){ if(e.key==="Enter") mask.querySelector('[data-act=ok]').click(); });
+  });
+}
+
+// 初始渲染会话列表（登录前也展示结构，登录后填数据）
+renderConvList();
+</script>
 </body>
 </html>
