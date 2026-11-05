@@ -21,21 +21,14 @@
 
  ***/
 
-@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800|Work+Sans:400,500,700');
-
 /*font-family: 'Poppins', sans-serif;
 font-family: 'Work Sans', sans-serif;*/
 
 @import url('font-awesome.css');
 @import url('flaticon.css');
 @import url('animate.css');
-@import url('owl.css');
-@import url('jquery-ui.css');
 @import url('jquery.fancybox.min.css');
-@import url('jquery.mCustomScrollbar.min.css');
 @import url('custom-animate.css');
-@import url('multi-scroll.css');
-
 /*** 
 
 ====================================================================
@@ -1936,3 +1929,31 @@ img{
     opacity: 1 !important;
     transform: translateX(10px);
 }
+
+/* ------------------------------------------------------------------
+   Labs 入口（作品集）
+   ------------------------------------------------------------------ */
+.labs-entry {
+    margin: 18px 0 6px;
+    text-align: center;
+}
+.labs-entry a {
+    display: inline-block;
+    max-width: 100%;
+    padding: 10px 18px;
+    border-radius: 30px;
+    background: #f5eefe;
+    border: 1px solid #e2d3fb;
+    color: #6a2fd0;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.5;
+    transition: .3s ease;
+}
+.labs-entry a:hover {
+    background: #9147ff;
+    border-color: #9147ff;
+    color: #fff;
+}
+.labs-entry__icon { margin-right: 4px; }
+.labs-entry__arrow { margin-left: 4px; }

@@ -1,0 +1,459 @@
+{
+  "choujiang/img/in_top_bj.jpg": {
+    "webp": "choujiang/img/in_top_bj.webp",
+    "width": 1600,
+    "height": 400,
+    "srcset": {
+      "1600": "choujiang/img/in_top_bj.webp"
+    }
+  },
+  "choujiang/img/万勇.jpg": {
+    "webp": "choujiang/img/万勇.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/万勇.webp"
+    }
+  },
+  "choujiang/img/伍永林.jpg": {
+    "webp": "choujiang/img/伍永林.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/伍永林.webp"
+    }
+  },
+  "choujiang/img/何建国.jpg": {
+    "webp": "choujiang/img/何建国.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/何建国.webp"
+    }
+  },
+  "choujiang/img/何欣妤.jpg": {
+    "webp": "choujiang/img/何欣妤.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/何欣妤.webp"
+    }
+  },
+  "choujiang/img/何鑫洋.jpg": {
+    "webp": "choujiang/img/何鑫洋.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/何鑫洋.webp"
+    }
+  },
+  "choujiang/img/余月真里.jpg": {
+    "webp": "choujiang/img/余月真里.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/余月真里.webp"
+    }
+  },
+  "choujiang/img/傅鹏.jpg": {
+    "webp": "choujiang/img/傅鹏.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/傅鹏.webp"
+    }
+  },
+  "choujiang/img/刘玲.jpg": {
+    "webp": "choujiang/img/刘玲.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/刘玲.webp"
+    }
+  },
+  "choujiang/img/刘蕴霖.jpg": {
+    "webp": "choujiang/img/刘蕴霖.webp",
+    "width": 400,
+    "height": 401,
+    "srcset": {
+      "400": "choujiang/img/刘蕴霖.webp"
+    }
+  },
+  "choujiang/img/周科宇.jpg": {
+    "webp": "choujiang/img/周科宇.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/周科宇.webp"
+    }
+  },
+  "choujiang/img/夏尚超.jpg": {
+    "webp": "choujiang/img/夏尚超.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/夏尚超.webp"
+    }
+  },
+  "choujiang/img/姜丹妮.jpg": {
+    "webp": "choujiang/img/姜丹妮.webp",
+    "width": 400,
+    "height": 399,
+    "srcset": {
+      "400": "choujiang/img/姜丹妮.webp"
+    }
+  },
+  "choujiang/img/孙卉.jpg": {
+    "webp": "choujiang/img/孙卉.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/孙卉.webp"
+    }
+  },
+  "choujiang/img/宋黎晖.jpg": {
+    "webp": "choujiang/img/宋黎晖.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/宋黎晖.webp"
+    }
+  },
+  "choujiang/img/尹思琪.jpg": {
+    "webp": "choujiang/img/尹思琪.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/尹思琪.webp"
+    }
+  },
+  "choujiang/img/张波.jpg": {
+    "webp": "choujiang/img/张波.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/张波.webp"
+    }
+  },
+  "choujiang/img/张继平.jpg": {
+    "webp": "choujiang/img/张继平.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/张继平.webp"
+    }
+  },
+  "choujiang/img/彭杰.jpg": {
+    "webp": "choujiang/img/彭杰.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/彭杰.webp"
+    }
+  },
+  "choujiang/img/彭炳燊.jpg": {
+    "webp": "choujiang/img/彭炳燊.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/彭炳燊.webp"
+    }
+  },
+  "choujiang/img/徐勇.jpg": {
+    "webp": "choujiang/img/徐勇.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/徐勇.webp"
+    }
+  },
+  "choujiang/img/徐聆潇.jpg": {
+    "webp": "choujiang/img/徐聆潇.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/徐聆潇.webp"
+    }
+  },
+  "choujiang/img/曹曦予.jpg": {
+    "webp": "choujiang/img/曹曦予.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/曹曦予.webp"
+    }
+  },
+  "choujiang/img/曾均一.jpg": {
+    "webp": "choujiang/img/曾均一.webp",
+    "width": 286,
+    "height": 286,
+    "srcset": {
+      "286": "choujiang/img/曾均一.webp"
+    }
+  },
+  "choujiang/img/李亚宁.jpg": {
+    "webp": "choujiang/img/李亚宁.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/李亚宁.webp"
+    }
+  },
+  "choujiang/img/李元程.jpg": {
+    "webp": "choujiang/img/李元程.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/李元程.webp"
+    }
+  },
+  "choujiang/img/李博文.jpg": {
+    "webp": "choujiang/img/李博文.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/李博文.webp"
+    }
+  },
+  "choujiang/img/李史明睿.jpg": {
+    "webp": "choujiang/img/李史明睿.webp",
+    "width": 370,
+    "height": 370,
+    "srcset": {
+      "370": "choujiang/img/李史明睿.webp"
+    }
+  },
+  "choujiang/img/李柏霖.jpg": {
+    "webp": "choujiang/img/李柏霖.webp",
+    "width": 400,
+    "height": 401,
+    "srcset": {
+      "400": "choujiang/img/李柏霖.webp"
+    }
+  },
+  "choujiang/img/李沛钊.jpg": {
+    "webp": "choujiang/img/李沛钊.webp",
+    "width": 400,
+    "height": 399,
+    "srcset": {
+      "400": "choujiang/img/李沛钊.webp"
+    }
+  },
+  "choujiang/img/李海涛.jpg": {
+    "webp": "choujiang/img/李海涛.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/李海涛.webp"
+    }
+  },
+  "choujiang/img/李雪倩.jpg": {
+    "webp": "choujiang/img/李雪倩.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/李雪倩.webp"
+    }
+  },
+  "choujiang/img/杨亚丽.jpg": {
+    "webp": "choujiang/img/杨亚丽.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/杨亚丽.webp"
+    }
+  },
+  "choujiang/img/杨俊磊.jpg": {
+    "webp": "choujiang/img/杨俊磊.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/杨俊磊.webp"
+    }
+  },
+  "choujiang/img/杨冯莉.jpg": {
+    "webp": "choujiang/img/杨冯莉.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/杨冯莉.webp"
+    }
+  },
+  "choujiang/img/杨鹄瑞.jpg": {
+    "webp": "choujiang/img/杨鹄瑞.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/杨鹄瑞.webp"
+    }
+  },
+  "choujiang/img/杨鹏.jpg": {
+    "webp": "choujiang/img/杨鹏.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/杨鹏.webp"
+    }
+  },
+  "choujiang/img/潘朝锟.jpg": {
+    "webp": "choujiang/img/潘朝锟.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/潘朝锟.webp"
+    }
+  },
+  "choujiang/img/王子怡.jpg": {
+    "webp": "choujiang/img/王子怡.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/王子怡.webp"
+    }
+  },
+  "choujiang/img/王艺璇.jpg": {
+    "webp": "choujiang/img/王艺璇.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/王艺璇.webp"
+    }
+  },
+  "choujiang/img/王齐良.jpg": {
+    "webp": "choujiang/img/王齐良.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/王齐良.webp"
+    }
+  },
+  "choujiang/img/田旭.jpg": {
+    "webp": "choujiang/img/田旭.webp",
+    "width": 200,
+    "height": 200,
+    "srcset": {
+      "200": "choujiang/img/田旭.webp"
+    }
+  },
+  "choujiang/img/礼包.png": {
+    "webp": "choujiang/img/礼包.webp",
+    "width": 600,
+    "height": 600,
+    "srcset": {
+      "600": "choujiang/img/礼包.webp"
+    }
+  },
+  "choujiang/img/禹云林.jpg": {
+    "webp": "choujiang/img/禹云林.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/禹云林.webp"
+    }
+  },
+  "choujiang/img/章学榕.jpg": {
+    "webp": "choujiang/img/章学榕.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/章学榕.webp"
+    }
+  },
+  "choujiang/img/肖光彬.jpg": {
+    "webp": "choujiang/img/肖光彬.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/肖光彬.webp"
+    }
+  },
+  "choujiang/img/胡馨太.jpg": {
+    "webp": "choujiang/img/胡馨太.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/胡馨太.webp"
+    }
+  },
+  "choujiang/img/苏亨.jpg": {
+    "webp": "choujiang/img/苏亨.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/苏亨.webp"
+    }
+  },
+  "choujiang/img/苏舟.jpg": {
+    "webp": "choujiang/img/苏舟.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/苏舟.webp"
+    }
+  },
+  "choujiang/img/邱心洋.jpg": {
+    "webp": "choujiang/img/邱心洋.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/邱心洋.webp"
+    }
+  },
+  "choujiang/img/郭宝瑞.jpg": {
+    "webp": "choujiang/img/郭宝瑞.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/郭宝瑞.webp"
+    }
+  },
+  "choujiang/img/郭涛.jpg": {
+    "webp": "choujiang/img/郭涛.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/郭涛.webp"
+    }
+  },
+  "choujiang/img/钟思敏.jpg": {
+    "webp": "choujiang/img/钟思敏.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/钟思敏.webp"
+    }
+  },
+  "choujiang/img/魏茂洋.jpg": {
+    "webp": "choujiang/img/魏茂洋.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/魏茂洋.webp"
+    }
+  },
+  "choujiang/img/黄佳汇.jpg": {
+    "webp": "choujiang/img/黄佳汇.webp",
+    "width": 400,
+    "height": 400,
+    "srcset": {
+      "400": "choujiang/img/黄佳汇.webp"
+    }
+  },
+  "choujiang/img/黄文鹤.jpg": {
+    "webp": "choujiang/img/黄文鹤.webp",
+    "width": 400,
+    "height": 401,
+    "srcset": {
+      "400": "choujiang/img/黄文鹤.webp"
+    }
+  },
+  "images/background/wuziqibg.jpg": {
+    "webp": "images/background/wuziqibg.webp",
+    "width": 1280,
+    "height": 720,
+    "srcset": {
+      "640": "images/background/wuziqibg-640.webp",
+      "1280": "images/background/wuziqibg.webp"
+    }
+  }
+}

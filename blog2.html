@@ -1,21 +1,32 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>Berlin's Blog</title>
+<title>半夜随笔 | Berlin&#39;s Blog</title>
+<meta name="description" content="凌晨写下的几百字，关于想念和一些说不清的情绪。">
+<meta name="keywords" content="博客, 随笔, 情绪">
+<meta name="author" content="Berlin Li">
+<meta name="theme-color" content="#9147ff">
+<link rel="canonical" href="https://berlin-blog.github.io/blog2.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Berlin's Blog">
+<meta property="og:title" content="半夜随笔 | Berlin's Blog">
+<meta property="og:description" content="凌晨写下的几百字，关于想念和一些说不清的情绪。">
+<meta property="og:url" content="https://berlin-blog.github.io/blog2.html">
+<meta property="og:image" content="https://berlin-blog.github.io/images/gallery/mao.webp">
+<meta name="twitter:card" content="summary_large_image">
 <!-- Stylesheets -->
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/style.css" rel="stylesheet">
-<link href="css/responsive.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Work+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="css/site.min.css" rel="stylesheet">
 
 <!--Favicon-->
 <link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
 <link rel="icon" href="images/favicon.png" type="image/x-icon">
 <!-- Responsive -->
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<!--[if lt IE 9]><script src="js/html5shiv.js"></script><![endif]-->
-<!--[if lt IE 9]><script src="js/respond.js"></script><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
@@ -51,13 +62,14 @@
                     <div class="navbar-collapse collapse scroll-nav clearfix">
                         <ul class="navigation clearfix">
                             
-                            <li class="current"><a href="#home">Home</a></li>
-                            <li><a href="#about">About</a></li>
-                            <li><a href="#resume">Experience</a></li>
-                            <li><a href="#services">Ability</a></li>
-                            <li><a href="#work">Photos</a></li>
-                            <li><a href="#blog">Blog</a></li>
-                            <li><a href="#contact">Contact</a></li>
+                            <li class="current"><a href="index.html#home">Home</a></li>
+                            <li><a href="index.html#about">About</a></li>
+                            <li><a href="index.html#resume">Experience</a></li>
+                            <li><a href="index.html#services">Ability</a></li>
+                            <li><a href="index.html#work">Photos</a></li>
+                            <li><a href="index.html#blog">Blog</a></li>
+                            <li><a href="index.html#contact">Contact</a></li>
+                            <li><a href="labs/index.html">Labs</a></li>
 
                          </ul>
                     </div>
@@ -72,8 +84,8 @@
         <div class="scroll-box">
             <div class="container" data-animation-in="fadeInLeft" data-animation-out="fadeOutLeft">
                 <div class="card-wrapper">
-                    <div class="author-info" style="background-image:url(images/background/3.jpg)">
-                        <div class="image"><img src="images/gallery/tou.png" alt=""></div>
+                    <div class="author-info" style="background-image:url(images/background/3.webp)">
+                        <div class="image"><img src="images/gallery/tou.webp" srcset="images/gallery/tou.webp 320w" sizes="120px" width="320" height="320" alt="Berlin 的头像" loading="eager" fetchpriority="high"></div>
                         <div class="author">
                             <h3>Berlin Li</h3>
                             <div class="designation">
@@ -90,7 +102,7 @@
                             </div>
                         </div>
                         <div class="link-btn">
-                            <a href="#" class="theme-btn btn-style-one">关于我</a>
+                            <a href="index.html#about" class="theme-btn btn-style-one">关于我</a>
                         </div>
                         <ul class="social-icon-two">
                             <li><a href="https://www.facebook.com/profile.php?id=61550317383451"><span class="fa fa-facebook"></span></a></li>
@@ -103,18 +115,18 @@
                         <header class="header">
                             <ul class="main-menu">
                                 <li class="home"><a class="logo" href="index.html"><img src="images/logo.png" alt=""></a></li>
-                                <li class="active"><a href="#blog"><i class="flaticon-blog"></i>Blog</a></li>
+                                <li class="active"><a href="index.html#blog"><i class="flaticon-blog"></i>Blog</a></li>
                             </ul>
                         </header>
 
                         <!-- card item -->
-                        <div class="card-blog single-post card-item active" id="blog" style="background-image:url(images/background/2.jpg)">
+                        <div class="card-blog single-post card-item active" id="blog" style="background-image:url(images/background/2.webp)">
                             <div class="card-inner">
                                 <h4 class="title">Latest Post</h4>
                                 <div class="news-block">
                                     <div class="inner-box">
                                         <div class="image">
-                                            <img src="images/gallery/xiang.jpg" alt="">
+                                            <img src="images/gallery/xiang.webp" srcset="images/gallery/xiang.webp 573w" sizes="(max-width: 767px) 92vw, 460px" width="573" height="572" alt="夜晚的街景" loading="lazy" decoding="async">
                                         </div>
                                         <div class="date"><strong>21</strong> <br>Jul</div>
                                         <div class="lower-content">
@@ -159,7 +171,7 @@
                                     <!--Comment Box-->
                                     <div class="comment-box">
                                         <div class="comment">
-                                            <div class="author-thumb"><img src="images/gallery/tou.png" alt=""></div>
+                                            <div class="author-thumb"><img src="images/gallery/tou.webp" srcset="images/gallery/tou.webp 320w" sizes="120px" width="320" height="320" alt="Berlin 的头像" loading="eager" fetchpriority="high"></div>
                                             <div class="comment-inner">
                                                 <div class="comment-info clearfix"><strong>Berlin Li</strong><div class="comment-time">21 Jul,2023 At 0:35pm</div></div>
                                                 <div class="text">希望你能看到，又羞于让你看到</div>
@@ -172,29 +184,16 @@
                                 </div>
                                 <!-- Contact Form -->
                                 <div class="contact-form">
-                                    <!--Comment Form-->
-                                    <form method="post" action="sendemail.php" id="contact-form">
-                                        <div class="row clearfix">
-                                            
-                                            <div class="col-md-6 form-group">
-                                                <input type="text" name="username" placeholder="名字" required>
-                                            </div>
-                                            
-                                            <div class="col-md-6 form-group">
-                                                <input type="email" name="email" placeholder="Email" required>
-                                            </div>
-
-                                            <div class="col-lg-12 col-md-12 form-group">
-                                                <textarea name="message" placeholder="善言结善缘，恶语伤人心~~"></textarea>
-                                            </div>
-                                            
-                                            <div class="col-lg-12 col-md-12 form-group">
-                                                <button class="theme-btn btn-style-two" type="submit" name="submit-form">发送 ✈ </button>
-                                            </div>
-                                            
-                                        </div>
-                                    </form>
-                                        
+                                        <p class="text" style="margin-bottom:18px">
+                                            站内表单已经下线（GitHub Pages 跑不了后端），
+                                            想聊天的话直接给我发邮件最快 👇
+                                        </p>
+                                        <p>
+                                            <a class="theme-btn btn-style-two"
+                                               href="mailto:probleandfd@gmail.com?subject=%E6%9D%A5%E8%87%AA%E4%B8%AA%E4%BA%BA%E7%AB%99%E7%9A%84%E9%97%AE%E5%80%99">
+                                               写封邮件给我
+                                            </a>
+                                        </p>
                                 </div>
                                 <!--End Contact Form -->
                             </div>
@@ -213,29 +212,7 @@
 <!--End pagewrapper-->
 
 
-<script src="js/jquery.js"></script> 
-
-<script src="js/bootstrap.min.js"></script>
-<script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
-<script src="js/owl.js"></script>
-<script src="js/wow.js"></script>
-<script src="js/appear.js"></script>
-<script src="js/jquery.fancybox.js"></script>
-<script src="js/element-in-view.js"></script>
-<script src="js/knob.js"></script>
-<script src="js/validate.js"></script>
-<script src="js/mousemoveparallax.js"></script>
-<script src="js/pagenav.js"></script>
-<script src="js/jquery-type.js"></script>
-<script src="js/particle-alone.js"></script>
-<script src="js/jquery.nicescroll.min.js"></script>
-<script src="js/script.js"></script>
-
-<!--Google Map APi Key-->
-<script src="http://ditu.google.cn/maps/api/js?key=AIzaSyATY4Rxc8jNvDpsK8ZetC7JyN4PFVYGCGM"></script>
-<script src="js/gmaps.js"></script>
-<script src="js/map-script.js"></script>
-<!--End Google Map APi-->
-
+<!-- 全站脚本已由 tools/build.mjs 打包成单文件 -->
+<script src="js/site.min.js" defer></script>
 </body>
 </html>

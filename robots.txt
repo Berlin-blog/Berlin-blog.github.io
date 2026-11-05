@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# 班级抽奖页含同学照片，不上搜索引擎索引
+Disallow: /choujiang/
+# 聊天室是实验品，也不进索引
+Disallow: /chat/
+
+Sitemap: https://berlin-blog.github.io/sitemap.xml

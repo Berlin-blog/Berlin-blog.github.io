@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>页面走丢了 · 404 | Berlin's Blog</title>
+<meta name="description" content="这个地址没有内容，回主页看看？">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/images/favicon.png">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    display: grid; place-items: center;
+    background: radial-gradient(900px 500px at 50% 0%, #2a1b45, #14101b 65%);
+    color: #ece7f5;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    text-align: center; padding: 24px;
+  }
+  .code {
+    font-size: clamp(72px, 18vw, 132px);
+    font-weight: 800; line-height: 1; letter-spacing: -.04em;
+    background: linear-gradient(120deg, #b98bff, #9147ff 55%, #ff8a5b);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin: 0 0 10px;
+  }
+  h1 { font-size: 20px; margin: 0 0 10px; font-weight: 600; }
+  p { color: #a79cb9; font-size: 14px; margin: 0 0 28px; }
+  .links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 11px 22px; border-radius: 999px;
+    text-decoration: none; font-size: 14px; transition: .25s;
+    border: 1px solid #2e2540; color: #a79cb9;
+  }
+  .btn:hover { color: #fff; border-color: #9147ff; background: rgba(145,71,255,.18); }
+  .btn.primary { background: #9147ff; border-color: #9147ff; color: #fff; }
+  .btn.primary:hover { background: #7f37f0; }
+</style>
+</head>
+<body>
+  <main>
+    <p class="code">404</p>
+    <h1>这个地址没有内容</h1>
+    <p>可能是链接过期了，也可能是我手滑改错了名字。</p>
+    <div class="links">
+      <a class="btn primary" href="/">回到主页</a>
+      <a class="btn" href="/labs/">看看作品集</a>
+    </div>
+  </main>
+</body>
+</html>

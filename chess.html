@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
-<title></title>
-<title>Chinese Chess</title>
+<meta charset="utf-8">
+<title>中国象棋 · 人机对战 | Berlin&#39;s Blog</title>
+
 <link href="css/zzsc.css" type="text/css" rel="stylesheet" />
+<meta name="description" content="带 AI 与棋谱记录的中国象棋，支持新手 / 中级难度、悔棋与放大棋盘。">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="images/favicon.png">
 </head>
 <body>
 <div class="box" id="box">
 	<div class="chess_left">
 		<canvas id="chess">对不起，您的浏览器不支持HTML5，请升级浏览器至IE9、firefox或者谷歌浏览器！</canvas>
-		<audio src="audio/click.wav" id="clickAudio" preload="auto"></audio>
-		<!--<audio src="audio/check.wav" id="checkAudio" preload="auto"></audio>-->
-		<audio src="audio/select.wav" id="selectAudio" preload="auto"></audio>
+		<audio id="clickAudio" preload="auto" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA="></audio>
+		<!--<audio src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" id="checkAudio" preload="auto"></audio>-->
+		<audio id="selectAudio" preload="auto" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA="></audio>
 		<link rel="stylesheet" type="text/css" href="https://www.bootcss.com/p/buttons/css/buttons.css">
 		<div>
 			<div class="bn_box" id="bnBox">
@@ -43,5 +46,6 @@
 <script src="js/AI.js"></script> 
 <script src="js/bill.js"></script> 
 <script src="js/gambit.js"></script>
+<a href="labs/" style="position:fixed;left:18px;bottom:18px;z-index:99999;padding:9px 16px;border-radius:22px;background:#9147ff;color:#fff;font:14px/1 -apple-system,'PingFang SC','Microsoft YaHei',sans-serif;text-decoration:none;box-shadow:0 6px 18px rgba(145,71,255,.35)">← 作品集</a>
 </body>
 </html>

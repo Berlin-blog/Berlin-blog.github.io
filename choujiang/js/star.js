@@ -103,7 +103,7 @@ function getStar(){
     
     var canvasBoxs = document.createElement("div");
    	var images = document.createElement('img');
-   	images.src="./img/in_top_bj.jpg";
+   	images.src="./img/in_top_bj.webp";
    	images.style.opacity ="0.4";
    	images.style.width="100%";
    	images.style.height = '1280px';

@@ -1,0 +1,19 @@
+{
+  "name": "berlin-blog",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Berlin Li 的个人网站 —— 纯静态站点，源码即产物",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "build:css": "node tools/build.mjs --only=css",
+    "build:js": "node tools/build.mjs --only=js",
+    "build:img": "python tools/optimize-images.py",
+    "check": "node tools/check-links.mjs",
+    "serve": "node tools/serve.mjs",
+    "verify": "node tools/verify-pages.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "license": "MIT"
+}

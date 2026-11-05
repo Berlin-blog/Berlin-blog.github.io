@@ -1,0 +1,38 @@
+name: site-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 安装依赖
+        run: npm ci --no-audit --no-fund
+
+      - name: 构建 CSS / JS
+        run: npm run build
+
+      - name: 构建产物是否已提交（防止漏跑 build）
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::构建产物与源码不一致，请在本地执行 npm run build 后一起提交"
+            git --no-pager diff --stat
+            exit 1
+          fi
+
+      - name: 死链检查
+        run: npm run check
+
+      - name: HTML 基本检查（title / viewport / 描述）
+        run: node tools/check-html.mjs

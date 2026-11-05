@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<title>抽奖环节</title>
+<meta name="robots" content="noindex, nofollow">
 		<link rel="stylesheet" href="./css/test.css">
 		<script src="js/three.min.js"></script>
 		<script src="js/tween.min.js"></script>
@@ -15,14 +16,15 @@
 		<script src="js/star.js"></script>
 		<!-- 数据位置 -->
 		<script src="js/data.js"></script>
-	</head>
+	<link rel="icon" href="../images/favicon.png">
+</head>
 	<body>
 		<div id="container"></div>
 		<div id="vueBoxs">
 			<div class="bss" @keypress.space="keyDowns()">
 				<div class="imgBox">
 					<p v-text="priceNow"></p>
-					<img src="./img/礼包.png" alt="" />
+					<img src="./img/礼包.webp" alt="" />
 				</div>
 				<div id="menu">
 					<button id="table" @click="start()">开始</button>
@@ -118,7 +120,7 @@ function init() {
 	// 创建切换图片
 	var elements = document.createElement( 'div' );
 	elements.className = 'changeImgBoxs';
-	// element.style.backgroundImage = "url(./img/pic.png)";
+
 	elements.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
 
 	var symbolBox = document.createElement( 'div' );
@@ -308,7 +310,7 @@ function objDeal(obj,nums){
 						img:'',
 						name:''
 					},
-					price1:[],//一等奖        // {name:'白富友3',img:'./img/pic.jpg'}
+					price1:[],//一等奖        // {name:'白富友3',img:'./img/pic.webp'}
 					price2:[],//二等奖
 					price3:[],//三等奖
 					lens:[0,0,54],   //奖励名额
