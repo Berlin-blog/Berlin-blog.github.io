@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>作品集 · Labs | Berlin's Blog</title>
+<meta name="description" content="Berlin 的十个小作品：中国象棋、五子棋、水果忍者、许愿树、3D 抽奖机、跳一跳、修真世界、匿名聊天室，以及两个自用小工具。">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17121f">
+<link rel="canonical" href="https://berlin-blog.github.io/labs/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="作品集 · Labs | Berlin's Blog">
+<meta property="og:description" content="十个自己写着玩的小东西：游戏、3D、工具。全部跑在浏览器里，没有后端。">
+<meta property="og:image" content="https://berlin-blog.github.io/labs/thumbs/fruit.webp">
+<link rel="icon" href="../images/favicon.png">
+<style>
+  :root {
+    --purple: #9147ff;
+    --purple-soft: #b98bff;
+    --bg: #14101b;
+    --card: #1d1727;
+    --line: #2e2540;
+    --text: #ece7f5;
+    --muted: #a79cb9;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: radial-gradient(1200px 600px at 50% -10%, #2a1b45 0%, var(--bg) 60%) no-repeat, var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 22px 80px; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .back {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 999px;
+    border: 1px solid var(--line); background: rgba(255,255,255,.03);
+    color: var(--muted); text-decoration: none; font-size: 14px;
+    transition: .25s;
+  }
+  .back:hover { color: #fff; border-color: var(--purple); background: rgba(145,71,255,.18); }
+
+  header.hero { padding: 54px 0 34px; }
+  .eyebrow {
+    display: inline-block; font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--purple-soft); margin-bottom: 14px;
+  }
+  h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.2; margin: 0 0 16px; letter-spacing: -.02em; }
+  h1 em { font-style: normal; color: var(--purple-soft); }
+  .lede { max-width: 620px; color: var(--muted); font-size: 16px; margin: 0; }
+
+  .grid {
+    display: grid; gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    margin-top: 44px;
+  }
+  .card {
+    display: flex; flex-direction: column;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(145,71,255,.55);
+    box-shadow: 0 18px 40px -18px rgba(145,71,255,.55);
+  }
+  .cover {
+    position: relative;
+    aspect-ratio: 8 / 5;
+    background: #241a33 center/cover no-repeat;
+    display: grid; place-items: center;
+    font-size: 46px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cover::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(20,16,27,0) 45%, rgba(20,16,27,.85) 100%);
+  }
+  .badge {
+    position: absolute; z-index: 2; top: 12px; left: 12px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; letter-spacing: .04em;
+    background: rgba(20,16,27,.72); color: var(--purple-soft);
+    border: 1px solid rgba(145,71,255,.4);
+    backdrop-filter: blur(6px);
+  }
+  .body { padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .body h2 { font-size: 17px; margin: 0; display: flex; align-items: center; gap: 8px; }
+  .body h2 span { font-size: 12px; font-weight: 400; color: #7d7192; }
+  .body p { margin: 0; font-size: 13.5px; color: var(--muted); flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .tags i {
+    font-style: normal; font-size: 11px; color: #cbb8ff;
+    background: rgba(145,71,255,.14); border-radius: 6px; padding: 3px 8px;
+  }
+  .more { font-size: 13px; color: var(--purple-soft); margin-top: 6px; }
+
+  footer {
+    margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center;
+    justify-content: space-between; color: var(--muted); font-size: 13px;
+  }
+  footer a { color: var(--purple-soft); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 520px) {
+    .wrap { padding: 26px 16px 56px; }
+    header.hero { padding: 36px 0 20px; }
+    .grid { gap: 16px; margin-top: 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="back" href="../index.html">← 回到主页</a>
+    <a class="back" href="mailto:probleandfd@gmail.com">说点什么</a>
+  </div>
+
+  <header class="hero">
+    <span class="eyebrow">Labs / 2022 – 2025</span>
+    <h1>写着玩的<em>十个小东西</em></h1>
+    <p class="lede">
+      没有后端、没有构建服务，全部是纯前端。有的是照着教程啃下来的，
+      有的是半夜睡不着突然想做的 —— 点开就能玩。
+    </p>
+  </header>
+
+  <main class="grid">
+
+    <a class="card" href="../chess.html">
+      <div class="cover"><span class="badge">AI 对战</span>
+        <img src="thumbs/chess.webp" width="800" height="500" alt="中国象棋棋盘界面" loading="lazy" decoding="async">
+      </div>
+      <div class="body">
+        <h2>中国象棋 <span>2023</span></h2>
+        <p>带 AI 走子的中国象棋，可以选难度、悔棋、看棋谱，棋盘还能放大。</p>
+        <div class="tags"><i>Canvas</i><i>AI</i><i>棋谱</i></div>
+        <div class="more">开始对局 →</div>
+      </div>
+    </a>
+
+    <a class="card" href="../wuziqi.html">
+      <div class="cover"><span class="badge">双人 / 人机</span>
+        <img src="thumbs/wuziqi.webp" width="800" height="500" alt="五子棋棋盘界面" loading="lazy" decoding="async">
+      </div>
+      <div class="body">
+        <h2>五子棋 <span>2023</span></h2>
+        <p>最经典的那版五子棋，落子、判胜、重开，逻辑都写在一个文件里。</p>
+        <div class="tags"><i>Canvas</i><i>原生 JS</i></div>
+        <div class="more">下一局 →</div>
+      </div>
+    </a>
+
+    <a class="card" href="../fruit.html">
+      <div class="cover"><span class="badge">小游戏</span>
+        <img src="thumbs/fruit.webp" width="800" height="500" alt="水果忍者开始界面" loading="lazy" decoding="async">
+      </div>
+      <div class="body">
+        <h2>水果忍者 <span>2022</span></h2>
+        <p>切水果，带刀光、爆汁动画和音效，是我最早一批「做出来能玩」的东西。</p>
+        <div class="tags"><i>Canvas</i><i>音频</i><i>计分</i></div>
+        <div class="more">切一刀 →</div>
+      </div>
+    </a>
+
+    <a class="card" href="../happytree.html">
+      <div class="cover" style="background-image:linear-gradient(135deg,#3b1d6e,#8a3dd6)">🌳<span class="badge">3D</span>
+      </div>
+      <div class="body">
+        <h2>许愿树 <span>2022</span></h2>
+        <p>three.js 做的发光许愿树，Bloom 后处理让光晕糊开，鼠标拖动可以转。</p>
+        <div class="tags"><i>three.js</i><i>Shader</i><i>后处理</i></div>
+        <div class="more">去看看 →</div>
+      </div>
+    </a>
+
+    <a class="card" href="../choujiang/test.html">
+      <div class="cover"><span class="badge">内部使用</span>
+        <img src="thumbs/choujiang.webp" width="800" height="500" alt="3D 抽奖机界面" loading="lazy" decoding="async">
+      </div>
+      <div class="body">
+        <h2>3D 抽奖机 <span>2023</span></h2>
+        <p>给班级活动写的抽奖：54 张卡片浮在星空里，转起来抽人，还带照片墙和中奖名单。</p>
+        <div class="tags"><i>three.js</i><i>CSS3D</i><i>动画</i></div>
+        <div class="more">打开抽奖机 →</div>
+      </div>
+    </a>
+
+    <a class="card" href="../wechatjump/jump.html">
+      <div class="cover"><span class="badge">复刻</span>
+        <img src="thumbs/jump.webp" width="800" height="500" alt="跳一跳游戏界面" loading="lazy" decoding="async">
+      </div>
+      <div class="body">
+        <h2>跳一跳 <span>2022</span></h2>
+        <p>小时候的微信跳一跳，用 Canvas + 简单物理复刻了一版，按住蓄力松手起跳。</p>
+        <div class="tags"><i>Canvas</i><i>物理</i></div>
+        <div class="more">按住跳 →</div>
+      </div>
+    </a>
+
+    <a class="card" href="../xiuxian/new_world.html">
+      <div class="cover" style="background-image:linear-gradient(135deg,#123a4d,#1f7a68)">🗡️<span class="badge">单文件</span>
+      </div>
+      <div class="body">
+        <h2>修真世界 <span>2025</span></h2>
+        <p>一个 100KB 的单文件小游戏：打坐、炼丹、突破境界，全部塞进一个 HTML 里。</p>
+        <div class="tags"><i>单文件</i><i>数值</i><i>RPG</i></div>
+        <div class="more">开始修仙 →</div>
+      </div>
+    </a>
+
+    <a class="card" href="../chat/index.html">
+      <div class="cover" style="background-image:linear-gradient(135deg,#2b1c4a,#4b3ac9)">💬<span class="badge">内部使用</span>
+      </div>
+      <div class="body">
+        <h2>匿名聊天室 <span>2025</span></h2>
+        <p>没有后端：消息走公共 MQTT broker，靠同一口令派生的 AES 密钥互相看见。</p>
+        <div class="tags"><i>MQTT</i><i>AES</i><i>localStorage</i></div>
+        <div class="more">进去看看 →</div>
+      </div>
+    </a>
+
+    <a class="card" href="../workoff.html">
+      <div class="cover"><span class="badge">小工具</span>
+        <img src="thumbs/workoff.webp" width="800" height="500" alt="工时倒计时界面" loading="lazy" decoding="async">
+      </div>
+      <div class="body">
+        <h2>工时倒计时 <span>2023</span></h2>
+        <p>上班的时候看一眼，距离下班还剩多久。纯粹的自我安慰工具。</p>
+        <div class="tags"><i>原生 JS</i><i>单文件</i></div>
+        <div class="more">看还剩多久 →</div>
+      </div>
+    </a>
+
+    <a class="card" href="../cleanlead.html">
+      <div class="cover"><span class="badge">工具</span>
+        <img src="thumbs/cleanlead.webp" width="800" height="500" alt="LeadClean 表格清洗界面" loading="lazy" decoding="async">
+      </div>
+      <div class="body">
+        <h2>LeadClean <span>2024</span></h2>
+        <p>把 Excel 里的脏数据直接丢进浏览器洗一遍：去重、补号码、导出新表，不上传服务器。</p>
+        <div class="tags"><i>SheetJS</i><i>纯前端</i></div>
+        <div class="more">清洗一张表 →</div>
+      </div>
+    </a>
+
+  </main>
+
+  <footer>
+    <span>所有小项目都是纯前端，源码就在这个仓库里。</span>
+    <span><a href="../index.html">主页</a> · <a href="https://github.com/Berlin-blog/Berlin-blog.github.io">GitHub</a></span>
+  </footer>
+
+</div>
+</body>
+</html>
