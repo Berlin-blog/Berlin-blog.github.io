@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>数独推理台 · 每一步都有理由 | Berlin's Blog</title>
+<meta name="description" content="一个会讲人话的数独破解器：唯一候选、隐性唯一、数对、区块、X-Wing、Swordfish、XY-Wing 逐步演示，每一步都解释为什么。">
+<meta name="theme-color" content="#0e1013">
+<link rel="icon" href="images/favicon.png">
+<link rel="stylesheet" href="css/sudoku.css">
+<link rel="canonical" href="https://berlin-blog.github.io/sudoku.html">
+<meta property="og:title" content="数独推理台 · 每一步都有理由">
+<meta property="og:description" content="不只给答案。把数独的思考链拆成可播放的步骤，讲清楚看哪里、为什么、得出什么。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://berlin-blog.github.io/sudoku.html">
+<meta property="og:image" content="https://berlin-blog.github.io/labs/thumbs/sudoku.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="masthead">
+    <a class="back-link" href="labs/index.html">
+      <span aria-hidden="true">←</span> 作品集
+    </a>
+
+    <div class="brand-block">
+      <span class="brand-mark" aria-hidden="true">
+        <i></i><i></i><i></i>
+        <i></i><i></i><i></i>
+        <i></i><i class="accent"></i><i></i>
+      </span>
+      <div>
+        <p class="eyebrow">SUDOKU / REASONING LAB</p>
+        <h1>数独推理台</h1>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <span class="header-note">不靠猜，靠结构</span>
+      <button class="toggle is-on" id="candidatesToggle" type="button" aria-pressed="true">
+        <span class="toggle-dot" aria-hidden="true"></span>候选数
+      </button>
+      <button class="btn btn-ghost" id="openEditor" type="button">录入题目</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="board-panel" aria-label="数独盘面">
+      <div class="board-head">
+        <div>
+          <p class="kicker" id="puzzleKicker">PUZZLE 02 / 04 · 进阶</p>
+          <h2 id="puzzleName">数对练习</h2>
+        </div>
+        <div class="board-head-right">
+          <span class="status-pill" id="statusPill"><i aria-hidden="true"></i><span>待推理</span></span>
+          <button class="btn btn-quiet mobile-link" id="toReason" type="button">讲解 <span aria-hidden="true">↓</span></button>
+          <button class="btn btn-quiet" id="cyclePreset" type="button">换一盘 <span aria-hidden="true">↻</span></button>
+        </div>
+      </div>
+
+      <div class="preset-tabs" id="presetTabs" role="tablist" aria-label="选择示例题目"></div>
+
+      <div class="board-shell">
+        <span class="shell-tick tick-a" aria-hidden="true"></span>
+        <span class="shell-tick tick-b" aria-hidden="true"></span>
+        <div class="board" id="board" role="grid" aria-label="九乘九数独盘面"></div>
+      </div>
+
+      <div class="legend" aria-label="盘面图例">
+        <span><i class="legend-dot focus"></i>当前结论</span>
+        <span><i class="legend-dot evidence"></i>推断依据</span>
+        <span><i class="legend-dot removed"></i>被删候选</span>
+        <span class="legend-hint"><kbd>←</kbd><kbd>→</kbd> 切换 · <kbd>空格</kbd> 播放</span>
+      </div>
+
+      <div class="progress-row">
+        <span class="progress-caption">推理进度</span>
+        <div class="progress-track" aria-hidden="true"><span id="progressFill"></span></div>
+        <span class="progress-text" id="progressText">0 / 0</span>
+      </div>
+
+      <div class="transport">
+        <button class="icon-btn" id="prevBtn" type="button" aria-label="上一步" disabled>←</button>
+        <button class="btn btn-primary play-btn" id="playBtn" type="button">
+          <span class="play-icon" id="playIcon" aria-hidden="true">▶</span>
+          <span id="playLabel">开始推理</span>
+        </button>
+        <button class="btn btn-ghost next-btn" id="nextBtn" type="button">下一步 <span aria-hidden="true">→</span></button>
+        <button class="btn btn-quiet jump-btn" id="jumpBtn" type="button" title="跳到下一种还没出现过的技巧">跳新技巧</button>
+        <label class="speed-control">
+          <span class="sr-only">播放速度</span>
+          <select id="speedSelect">
+            <option value="2600">慢速</option>
+            <option value="1600" selected>标准</option>
+            <option value="850">快速</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <aside class="reason-panel" aria-label="推理讲解">
+      <div class="panel-head">
+        <div>
+          <p class="kicker">REASONING TRACE</p>
+          <h2>推理过程</h2>
+        </div>
+        <div class="panel-tools">
+          <span class="live-badge" id="liveBadge"><i aria-hidden="true"></i><span>READY</span></span>
+          <button class="panel-nav" id="panelPrev" type="button" aria-label="上一步">←</button>
+          <button class="panel-nav" id="panelNext" type="button" aria-label="下一步">→</button>
+          <button class="panel-board-link" id="toBoard" type="button">盘面 ↑</button>
+        </div>
+      </div>
+      <div class="reason-body" id="reasonBody"></div>
+    </aside>
+  </main>
+
+  <footer class="page-footer">
+    <p>把「候选数」当作草稿纸：先缩小可能性，再落子。</p>
+    <p><a href="labs/index.html">更多小作品</a><span>·</span><a href="index.html">主页</a></p>
+  </footer>
+</div>
+
+<div class="modal" id="editorModal" hidden>
+  <div class="modal-backdrop" data-close-editor></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+    <button class="modal-close" id="closeEditor" type="button" aria-label="关闭">×</button>
+    <div class="modal-head">
+      <p class="kicker">SET A PUZZLE</p>
+      <h2 id="editorTitle">录入一道自己的题</h2>
+      <p>在格子里填已知数，空格留白。也可以直接粘贴 81 个字符：<code>0</code> 或 <code>.</code> 代表空格。</p>
+    </div>
+
+    <div class="editor-layout">
+      <div class="editor-left">
+        <div class="editor-grid" id="editorGrid" aria-label="题目录入盘面"></div>
+        <div class="editor-tip-row">
+          <p class="editor-tip">键盘输入 1–9，<kbd>Backspace</kbd> 清除；方向键可移动。</p>
+          <button class="editor-clear" id="clearEditor" type="button">清空</button>
+        </div>
+      </div>
+
+      <div class="editor-right">
+        <p class="field-label">载入示例</p>
+        <div class="preset-picks" id="editorPresets"></div>
+
+        <label class="paste-field">
+          <span class="field-label">批量粘贴</span>
+          <textarea id="pasteInput" rows="3" spellcheck="false" placeholder="粘贴 81 个数字，例如：&#10;530070000600195000..."></textarea>
+        </label>
+
+        <p class="form-error" id="editorError" hidden></p>
+
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="cancelEditor" type="button">取消</button>
+          <button class="btn btn-primary" id="submitEditor" type="button">开始推理 <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/sudoku-engine.js" defer></script>
+<script src="js/sudoku-app.js" defer></script>
+</body>
+</html>
