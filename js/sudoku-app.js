@@ -2,7 +2,9 @@
   'use strict';
 
   const E = window.SudokuEngine;
+  const G = window.SudokuGenerator;
   if (!E) throw new Error('SudokuEngine 未加载');
+  if (!G) throw new Error('SudokuGenerator 未加载');
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -18,6 +20,8 @@
     liveBadge: $('#liveBadge'),
     cyclePreset: $('#cyclePreset'),
     candidatesToggle: $('#candidatesToggle'),
+    randomBtn: $('#randomBtn'),
+    exportBtn: $('#exportBtn'),
     openEditor: $('#openEditor'),
     reasonBody: $('#reasonBody'),
     progressFill: $('#progressFill'),
@@ -42,6 +46,22 @@
     clearEditor: $('#clearEditor'),
     closeEditor: $('#closeEditor'),
     cancelEditor: $('#cancelEditor'),
+    generatorModal: $('#generatorModal'),
+    closeGenerator: $('#closeGenerator'),
+    difficultyGrid: $('#difficultyGrid'),
+    generateBtn: $('#generateBtn'),
+    generationResult: $('#generationResult'),
+    exportModal: $('#exportModal'),
+    closeExport: $('#closeExport'),
+    exportSummary: $('#exportSummary'),
+    exportFormats: $('#exportFormats'),
+    exportPreview: $('#exportPreview'),
+    exportAnswer: $('#exportAnswer'),
+    exportAnswerLabel: $('#exportAnswerLabel'),
+    exportSteps: $('#exportSteps'),
+    exportStepsOption: $('#exportStepsOption'),
+    copyPuzzle: $('#copyPuzzle'),
+    downloadExport: $('#downloadExport'),
     toast: $('#toast'),
   };
 
@@ -55,8 +75,33 @@
     timer: null,
     speed: 1600,
     showCandidates: true,
-    modalOpen: false,
+    activeModal: null,
     lastFocus: null,
+    generated: null,
+    genDifficulty: 'medium',
+    genBusy: false,
+    exportFormat: 'txt',
+  };
+
+  const EXPORT_FORMATS = {
+    txt: {
+      extension: 'txt',
+      name: 'TXT',
+      label: '纯文本',
+      description: '题面、答案、可选的分步解析',
+    },
+    csv: {
+      extension: 'csv',
+      name: 'CSV',
+      label: '表格',
+      description: '9×9 双表，可用 Excel 打开',
+    },
+    png: {
+      extension: 'png',
+      name: 'PNG',
+      label: '题面卡片',
+      description: '适合打印或分享的高清图',
+    },
   };
 
   function escapeHtml(value) {
@@ -344,17 +389,21 @@
   function renderIntro() {
     const stats = state.result.stats;
     const techniques = techniqueList();
-    const preset = state.meta && state.meta.preset;
-    const custom = state.meta && state.meta.type === 'custom';
+    const meta = state.meta || {};
+    const preset = meta.preset;
+    const custom = meta.type === 'custom';
+    const random = meta.type === 'random';
     const givens = stats.givens;
     const total = stats.totalSteps;
     const pure = stats.logicalSteps;
     const fallback = stats.fallbackSteps;
-    const lede = custom
-      ? `这是你录入的题：${givens} 个已知数，拆成 ${total} 步。先看候选数，再跟着证据走。`
-      : preset
-        ? `${preset.note} 共 ${givens} 个已知数，会拆成 ${total} 步。`
-        : `这盘题有 ${givens} 个已知数，会拆成 ${total} 步。`;
+    const lede = random
+      ? `这是随机生成的${meta.difficulty.name}题，编号 ${meta.id}：${givens} 个已知数，拆成 ${total} 步。可以开始推理，也可以从右上角导出。`
+      : custom
+        ? `这是你录入的题：${givens} 个已知数，拆成 ${total} 步。先看候选数，再跟着证据走。`
+        : preset
+          ? `${preset.note} 共 ${givens} 个已知数，会拆成 ${total} 步。`
+          : `这盘题有 ${givens} 个已知数，会拆成 ${total} 步。`;
     const warningHtml = state.result.warnings.length
       ? `<div class="warning-box"><span aria-hidden="true">△</span><span>${escapeHtml(state.result.warnings.join(' '))}</span></div>`
       : '';
@@ -493,7 +542,9 @@
       </button>`).join('');
   }
 
-  function currentTitle(preset) {
+  function currentTitle(meta) {
+    if (meta && meta.type === 'random') return `随机题 · ${meta.difficulty.name}`;
+    const preset = meta && meta.preset;
     if (!preset) return '自定义题目';
     if (preset.id === 'starter') return '热身题';
     if (preset.id === 'expert') return '全技巧挑战';
@@ -514,10 +565,16 @@
     state.result = result;
     state.cursor = -1;
     state.presetIndex = meta && meta.type === 'preset' ? meta.presetIndex : -1;
-    els.puzzleKicker.textContent = meta && meta.type === 'preset'
-      ? `PUZZLE ${pad2(meta.presetIndex + 1)} / ${pad2(E.PRESETS.length)} · ${meta.preset.difficulty}`
-      : 'CUSTOM PUZZLE · 自定义';
-    els.puzzleName.textContent = currentTitle(meta && meta.preset);
+    if (meta && meta.type !== 'preset' && !meta.createdAt) meta.createdAt = new Date().toISOString();
+    if (meta && meta.type === 'preset') {
+      els.puzzleKicker.textContent = `PUZZLE ${pad2(meta.presetIndex + 1)} / ${pad2(E.PRESETS.length)} · ${meta.preset.difficulty}`;
+    } else if (meta && meta.type === 'random') {
+      els.puzzleKicker.textContent = `RANDOM PUZZLE · ${meta.difficulty.name} · ${meta.id}`;
+    } else {
+      els.puzzleKicker.textContent = 'CUSTOM PUZZLE · 自定义';
+    }
+    els.puzzleName.textContent = currentTitle(meta);
+    if (els.exportBtn) els.exportBtn.disabled = false;
     renderTabs();
     renderBoard();
     renderReason();
@@ -548,6 +605,523 @@
     els.board.classList.toggle('hide-notes', !show);
     els.candidatesToggle.classList.toggle('is-on', show);
     els.candidatesToggle.setAttribute('aria-pressed', String(show));
+  }
+
+  /* -------------------------------- generator ------------------------------- */
+  function buildDifficultyGrid() {
+    els.difficultyGrid.innerHTML = G.DIFFICULTIES.map((difficulty) => `
+      <button class="difficulty-card tone-${difficulty.tone}" type="button" role="radio"
+        aria-checked="false" data-difficulty="${difficulty.id}">
+        <span class="diff-top"><b>${escapeHtml(difficulty.name)}</b><span class="diff-count">约 ${difficulty.target} 线索</span></span>
+        <p>${escapeHtml(difficulty.description)}</p>
+      </button>`).join('');
+    renderDifficultySelection();
+  }
+
+  function renderDifficultySelection() {
+    $$('.difficulty-card', els.difficultyGrid).forEach((card) => {
+      const active = card.dataset.difficulty === state.genDifficulty;
+      card.classList.toggle('is-active', active);
+      card.setAttribute('aria-checked', String(active));
+      card.disabled = state.genBusy;
+    });
+  }
+
+  function renderGenerationEmpty(message) {
+    els.generationResult.innerHTML = `
+      <div class="gen-empty">
+        <span class="gen-empty-mark" aria-hidden="true">9 × 9</span>
+        <p>${message || '选好难度，生成第一道随机题。'}</p>
+        <span>生成后会在这里预览题面与推理统计。</span>
+      </div>`;
+  }
+
+  function renderGenerationBusy() {
+    els.generationResult.innerHTML = `
+      <div class="gen-busy">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>正在生成题目</p>
+        <small>挖空并逐格验证唯一解，同时计算推理链…</small>
+      </div>`;
+  }
+
+  function buildMiniBoard(grid, mount) {
+    if (!mount) return;
+    mount.innerHTML = '';
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'gen-cell';
+        if (c === 2 || c === 5) cell.classList.add('bR');
+        if (r === 2 || r === 5) cell.classList.add('bB');
+        const value = grid[r * 9 + c];
+        cell.textContent = value ? String(value) : '';
+        mount.appendChild(cell);
+      }
+    }
+  }
+
+  function renderGenerationResult() {
+    const gen = state.generated;
+    if (!gen) { renderGenerationEmpty(); return; }
+    const techniques = gen.techniques.map((item) => `
+      <span class="gen-tech tone-${item.tone}"><i aria-hidden="true"></i>${escapeHtml(item.technique)}<b>${item.count}</b></span>`).join('');
+    const fallbackText = gen.stats.fallbackSteps
+      ? `<span style="color:#d7b06b">${gen.stats.fallbackSteps} 步分支兜底</span>`
+      : '<span style="color:#7ed8c5">全部纯逻辑</span>';
+    els.generationResult.innerHTML = `
+      <div class="gen-result-view">
+        <div>
+          <div class="gen-board-frame"><div class="gen-board" id="genBoardPreview" aria-label="随机题题面"></div></div>
+          <div class="gen-board-caption"><span>${gen.clues} 个已知数</span><span>UNIQUE</span></div>
+        </div>
+        <div class="gen-info">
+          <p class="kicker">GENERATED · ${escapeHtml(gen.id)}</p>
+          <h3>${escapeHtml(gen.difficulty.name)} · ${gen.clues} 个已知数</h3>
+          <p>${escapeHtml(gen.difficulty.description)}</p>
+          <div class="gen-stats">
+            <span><b>${gen.stats.totalSteps}</b>步推理</span>
+            <span><b>${gen.stats.logicalSteps}</b>步纯逻辑</span>
+            <span>${fallbackText}</span>
+            <span>唯一解</span>
+          </div>
+          <div class="gen-techs">${techniques}</div>
+          <div class="gen-actions">
+            <button class="btn btn-primary" id="useGenerated" type="button">开始推理 <span aria-hidden="true">→</span></button>
+            <button class="btn btn-ghost" id="exportGenerated" type="button">直接导出</button>
+            <button class="btn btn-quiet" id="regenGenerated" type="button">换一道 ↻</button>
+          </div>
+        </div>
+      </div>`;
+    buildMiniBoard(gen.analysis.initialGrid, $('#genBoardPreview', els.generationResult));
+  }
+
+  function openGenerator() {
+    if (!els.difficultyGrid.children.length) buildDifficultyGrid();
+    renderDifficultySelection();
+    if (state.generated) renderGenerationResult();
+    else renderGenerationEmpty();
+    openModal(els.generatorModal);
+  }
+
+  function selectGeneratorDifficulty(id) {
+    if (state.genBusy) return;
+    const difficulty = G.difficultyById(id);
+    state.genDifficulty = difficulty.id;
+    state.generated = null;
+    renderDifficultySelection();
+    renderGenerationEmpty();
+  }
+
+  function generateRandom() {
+    if (state.genBusy) return;
+    state.genBusy = true;
+    renderDifficultySelection();
+    els.generateBtn.disabled = true;
+    els.generateBtn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:1.5px"></span> 生成中…';
+    renderGenerationBusy();
+    setTimeout(() => {
+      try {
+        const gen = G.generatePuzzle({ difficulty: state.genDifficulty });
+        state.generated = gen;
+        renderGenerationResult();
+        showToast(`已生成 ${gen.difficulty.name}题 · ${gen.clues} 个已知数`);
+        if (window.matchMedia && window.matchMedia('(max-width: 620px)').matches) {
+          setTimeout(() => {
+            const card = els.generatorModal.querySelector('.modal-card');
+            if (!card) return;
+            const top = els.generationResult.getBoundingClientRect().top - card.getBoundingClientRect().top + card.scrollTop - 10;
+            card.scrollTo({ top, behavior: 'smooth' });
+          }, 80);
+        }
+      } catch (error) {
+        state.generated = null;
+        renderGenerationEmpty(error.message || '生成失败，请再试一次。');
+        showToast('生成失败，请再试一次');
+      } finally {
+        state.genBusy = false;
+        els.generateBtn.disabled = false;
+        els.generateBtn.innerHTML = '<span aria-hidden="true">✦</span> 生成题目';
+        renderDifficultySelection();
+      }
+    }, 90);
+  }
+
+  function useGenerated(gen, exportNow) {
+    if (!gen) return;
+    const meta = {
+      type: 'random',
+      difficulty: gen.difficulty,
+      id: gen.id,
+      seed: gen.seed,
+      createdAt: new Date().toISOString(),
+    };
+    closeActiveModal({ restoreFocus: false });
+    loadPuzzle(gen.puzzle, meta, gen.analysis);
+    showToast(`随机题已载入 · ${gen.stats.totalSteps} 步推理`);
+    if (exportNow) {
+      requestAnimationFrame(() => {
+        if (els.exportBtn) els.exportBtn.focus();
+        openExport();
+      });
+    } else {
+      requestAnimationFrame(() => els.playBtn.focus());
+    }
+  }
+
+  /* --------------------------------- export --------------------------------- */
+  function exportInfo() {
+    const meta = state.meta || {};
+    const preset = meta.preset;
+    const difficulty = meta.type === 'random'
+      ? meta.difficulty.name
+      : preset
+        ? preset.difficulty
+        : '自定义';
+    const key = meta.type === 'random'
+      ? meta.difficulty.id
+      : preset
+        ? preset.id
+        : 'custom';
+    const id = meta.id || (preset ? `PRESET-${preset.id.toUpperCase()}` : 'CUSTOM');
+    const source = meta.type === 'random'
+      ? '随机生成'
+      : meta.type === 'preset'
+        ? '内置示例'
+        : '手动录入';
+    return {
+      meta,
+      preset,
+      difficulty,
+      key,
+      id,
+      source,
+      title: currentTitle(meta),
+      createdAt: meta.createdAt || new Date().toISOString(),
+    };
+  }
+
+  function formatDateTime(date) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  function formatGrid(grid) {
+    const rows = [];
+    for (let r = 0; r < 9; r++) {
+      rows.push(grid.slice(r * 9, r * 9 + 9).map((v) => v || 0).join(''));
+    }
+    return rows;
+  }
+
+  function techniqueLine() {
+    return Object.entries(state.result.stats.techniqueCounts)
+      .map(([name, count]) => `${name} ${count}`)
+      .join(' · ');
+  }
+
+  function buildTextExport() {
+    const info = exportInfo();
+    const stats = state.result.stats;
+    const includeAnswer = els.exportAnswer.checked;
+    const includeSteps = els.exportSteps.checked;
+    const lines = [
+      '数独推理台 · Sudoku Reasoning Lab',
+      `题目：${info.title}`,
+      `编号：${info.id}`,
+      `难度：${info.difficulty}`,
+      `线索：${stats.givens} 个已知数 / ${stats.empties} 个空格`,
+      `推理：${stats.totalSteps} 步（纯逻辑 ${stats.logicalSteps}，分支验证 ${stats.fallbackSteps}）`,
+      `唯一解：${state.result.warnings.length ? '否（多解）' : '是'}`,
+      `来源：${info.source}`,
+      `记录时间：${formatDateTime(new Date(info.createdAt))}`,
+      `导出时间：${formatDateTime(new Date())}`,
+      '',
+      '【题面】0 表示空格',
+      ...formatGrid(state.result.initialGrid),
+    ];
+
+    if (includeAnswer) {
+      lines.push('', '【答案】', ...formatGrid(state.result.solution));
+    }
+    if (includeSteps) {
+      lines.push('', '【分步解析】');
+      state.result.steps.forEach((step) => {
+        lines.push(`${pad2(step.index)}. [${step.technique}] ${step.title}`);
+        step.chain.forEach((item) => lines.push(`    ${item.k}：${item.t}`));
+      });
+    }
+
+    lines.push(
+      '',
+      `技巧分布：${techniqueLine() || '无'}`,
+      '',
+      '由「数独推理台」生成 · https://berlin-blog.github.io/sudoku.html',
+    );
+    return `\ufeff${lines.join('\r\n')}`;
+  }
+
+  function csvEscape(value) {
+    const text = String(value);
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  }
+
+  function buildCsvExport() {
+    const info = exportInfo();
+    const stats = state.result.stats;
+    const includeAnswer = els.exportAnswer.checked;
+    const rows = [
+      ['数独推理台导出'],
+      ['题目', info.title],
+      ['编号', info.id],
+      ['难度', info.difficulty],
+      ['线索数', stats.givens],
+      ['空格数', stats.empties],
+      ['推理步数', stats.totalSteps],
+      ['唯一解', state.result.warnings.length ? '否' : '是'],
+      ['来源', info.source],
+      [],
+      ['类型', '行', 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    ];
+    formatGrid(state.result.initialGrid).forEach((row, index) => {
+      rows.push(['题目', index + 1, ...row.split('')]);
+    });
+    if (includeAnswer) {
+      rows.push([]);
+      rows.push(['类型', '行', 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+      formatGrid(state.result.solution).forEach((row, index) => {
+        rows.push(['答案', index + 1, ...row.split('')]);
+      });
+    }
+    return `\ufeff${rows.map((row) => row.map(csvEscape).join(',')).join('\r\n')}`;
+  }
+
+  function drawBoardOnCanvas(ctx, grid, x, y, size, answer) {
+    const cell = size / 9;
+    ctx.fillStyle = '#fbf7ed';
+    ctx.fillRect(x, y, size, size);
+
+    for (let i = 0; i <= 9; i++) {
+      const strong = i % 3 === 0;
+      ctx.beginPath();
+      ctx.strokeStyle = strong ? '#3a362d' : '#d2c9b7';
+      ctx.lineWidth = strong ? 3 : 1;
+      const px = Math.round(x + i * cell) + 0.5;
+      const py = Math.round(y + i * cell) + 0.5;
+      ctx.moveTo(px, y);
+      ctx.lineTo(px, y + size);
+      ctx.moveTo(x, py);
+      ctx.lineTo(x + size, py);
+      ctx.stroke();
+    }
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = answer ? '#0b756f' : '#24231d';
+    ctx.font = `600 ${Math.round(cell * 0.55)}px Georgia, "Times New Roman", serif`;
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        const value = grid[r * 9 + c];
+        if (value) ctx.fillText(String(value), x + (c + 0.5) * cell, y + (r + 0.5) * cell + 1);
+      }
+    }
+
+    ctx.strokeStyle = '#3a362d';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x + 2, y + 2, size - 4, size - 4);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+  }
+
+  function buildPngExport() {
+    return new Promise((resolve, reject) => {
+      const info = exportInfo();
+      const stats = state.result.stats;
+      const includeAnswer = els.exportAnswer.checked;
+      const width = 1080;
+      const height = includeAnswer ? 1810 : 1240;
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#f4efe4';
+      ctx.fillRect(0, 0, width, height);
+      ctx.strokeStyle = '#d9d0be';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(34, 34, width - 68, height - 68);
+
+      ctx.fillStyle = '#b57b1e';
+      ctx.font = '500 17px "SFMono-Regular", Consolas, monospace';
+      ctx.fillText('SUDOKU / REASONING LAB', 110, 92);
+
+      ctx.fillStyle = '#25231d';
+      ctx.font = '600 52px "Microsoft YaHei", "PingFang SC", sans-serif';
+      ctx.fillText(`数独 · ${info.difficulty}`, 110, 158);
+
+      ctx.fillStyle = '#786e5b';
+      ctx.font = '19px "Microsoft YaHei", "PingFang SC", sans-serif';
+      ctx.fillText(`#${info.id}  ·  ${stats.givens} 个已知数  ·  ${state.result.warnings.length ? '多个解' : '唯一解'}`, 110, 199);
+
+      ctx.strokeStyle = '#d9d0be';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(110, 230);
+      ctx.lineTo(970, 230);
+      ctx.stroke();
+
+      drawBoardOnCanvas(ctx, state.result.initialGrid, 160, 268, 760, false);
+
+      if (includeAnswer) {
+        ctx.fillStyle = '#25231d';
+        ctx.font = '600 30px "Microsoft YaHei", "PingFang SC", sans-serif';
+        ctx.fillText('答案', 110, 1112);
+        ctx.fillStyle = '#8a806d';
+        ctx.font = '15px "Microsoft YaHei", "PingFang SC", sans-serif';
+        ctx.fillText('用于核对，不建议边看边填。', 182, 1108);
+        drawBoardOnCanvas(ctx, state.result.solution, 250, 1150, 580, true);
+        ctx.fillStyle = '#8a806d';
+        ctx.font = '14px "Microsoft YaHei", "PingFang SC", sans-serif';
+        ctx.fillText('由「数独推理台」生成 · berlin-blog.github.io/sudoku.html', 110, 1780);
+      } else {
+        ctx.fillStyle = '#8a806d';
+        ctx.font = '14px "Microsoft YaHei", "PingFang SC", sans-serif';
+        ctx.fillText('由「数独推理台」生成 · berlin-blog.github.io/sudoku.html', 110, 1142);
+      }
+
+      canvas.toBlob((blob) => {
+        if (blob) resolve(blob);
+        else reject(new Error('图片生成失败。'));
+      }, 'image/png');
+    });
+  }
+
+  function exportFileName(extension) {
+    const info = exportInfo();
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const date = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+    const id = String(info.id || 'CUSTOM').replace(/[^A-Za-z0-9-]/g, '') || 'CUSTOM';
+    const key = String(info.key || 'custom').replace(/[^A-Za-z0-9-]/g, '') || 'custom';
+    return `sudoku-${date}-${key}-${id}.${extension}`;
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  function buildExportFormats() {
+    els.exportFormats.innerHTML = Object.entries(EXPORT_FORMATS).map(([id, format]) => `
+      <button class="export-format" type="button" role="radio" aria-checked="false" data-format="${id}">
+        <span class="ext">.${format.extension}</span>
+        <b>${format.name} · ${format.label}</b>
+        <span>${format.description}</span>
+      </button>`).join('');
+  }
+
+  function updateExportUI() {
+    const format = EXPORT_FORMATS[state.exportFormat];
+    const file = exportFileName(format.extension);
+    const includeAnswer = els.exportAnswer.checked;
+    const includeSteps = els.exportSteps.checked;
+    $$('.export-format', els.exportFormats).forEach((button) => {
+      const active = button.dataset.format === state.exportFormat;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-checked', String(active));
+    });
+    els.exportAnswerLabel.textContent = state.exportFormat === 'png' ? '附带答案图' : '包含答案';
+    els.exportStepsOption.hidden = state.exportFormat !== 'txt';
+    const parts = [file];
+    if (state.exportFormat === 'txt') {
+      parts.push(includeAnswer ? '题面 + 答案' : '仅题面');
+      if (includeSteps) parts.push('含分步解析');
+    } else if (state.exportFormat === 'csv') {
+      parts.push(includeAnswer ? '题目表 + 答案表' : '仅题目表');
+      parts.push('Excel 可直接打开');
+    } else {
+      parts.push(includeAnswer ? '1080 × 1810 px，附答案图' : '1080 × 1240 px');
+    }
+    els.exportPreview.textContent = parts.join(' · ');
+    els.downloadExport.textContent = `下载 .${format.extension}`;
+    els.exportSteps.disabled = state.exportFormat !== 'txt';
+  }
+
+  function openExport() {
+    if (!state.result) {
+      showToast('还没有可导出的题目。');
+      return;
+    }
+    const info = exportInfo();
+    const stats = state.result.stats;
+    els.exportSummary.innerHTML = `
+      <div>
+        <p class="kicker">${escapeHtml(info.id)}</p>
+        <h3>${escapeHtml(info.title)}</h3>
+      </div>
+      <div class="export-summary-meta">
+        <span>${stats.givens} 线索</span>
+        <span>${stats.totalSteps} 步</span>
+        <span>${state.result.warnings.length ? '多解' : '唯一解'}</span>
+      </div>`;
+    if (!els.exportFormats.children.length) buildExportFormats();
+    updateExportUI();
+    openModal(els.exportModal);
+  }
+
+  async function copyText(text) {
+    let copied = false;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        copied = true;
+      } catch (error) { /* 继续尝试兼容复制 */ }
+    }
+    if (!copied) {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        copied = document.execCommand('copy');
+        textarea.remove();
+      } catch (error) { /* 忽略，下面统一提示 */ }
+    }
+    showToast(copied ? '已复制 81 字符题面' : '复制失败，请手动选择题面');
+  }
+
+  async function downloadExport() {
+    if (!state.result) return;
+    const format = EXPORT_FORMATS[state.exportFormat];
+    const filename = exportFileName(format.extension);
+    els.downloadExport.disabled = true;
+    const oldLabel = els.downloadExport.textContent;
+    els.downloadExport.textContent = '导出中…';
+    try {
+      if (state.exportFormat === 'txt') {
+        downloadBlob(new Blob([buildTextExport()], { type: 'text/plain;charset=utf-8' }), filename);
+      } else if (state.exportFormat === 'csv') {
+        downloadBlob(new Blob([buildCsvExport()], { type: 'text/csv;charset=utf-8' }), filename);
+      } else {
+        const blob = await buildPngExport();
+        downloadBlob(blob, filename);
+      }
+      showToast(`已导出 ${filename}`);
+    } catch (error) {
+      showToast(error.message || '导出失败，请重试');
+    } finally {
+      els.downloadExport.disabled = false;
+      els.downloadExport.textContent = oldLabel;
+      updateExportUI();
+    }
   }
 
   /* --------------------------------- editor --------------------------------- */
@@ -601,9 +1175,39 @@
     els.editorError.hidden = !message;
   }
 
-  function openEditor() {
+  function openModal(modal) {
+    if (!modal) return;
     stopPlayback();
+    if (state.activeModal && state.activeModal !== modal) state.activeModal.hidden = true;
     state.lastFocus = document.activeElement;
+    state.activeModal = modal;
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+    const card = modal.querySelector('.modal-card');
+    if (card) card.scrollTop = 0;
+    requestAnimationFrame(() => {
+      const preferred = modal.querySelector('[data-modal-focus]');
+      const target = preferred || modal.querySelector('button:not(:disabled), input:not(:disabled), textarea:not(:disabled)');
+      if (target) target.focus();
+    });
+  }
+
+  function closeActiveModal(options = {}) {
+    const modal = state.activeModal;
+    if (!modal) return;
+    modal.hidden = true;
+    state.activeModal = null;
+    document.body.style.overflow = '';
+    if (options.restoreFocus !== false && state.lastFocus && typeof state.lastFocus.focus === 'function') {
+      state.lastFocus.focus();
+    }
+  }
+
+  function closeEditor() {
+    if (state.activeModal === els.editorModal) closeActiveModal();
+  }
+
+  function openEditor() {
     if (state.result) {
       fillEditor(state.result.initialGrid);
     } else {
@@ -611,23 +1215,13 @@
     }
     els.pasteInput.value = '';
     showEditorError('');
-    els.editorModal.hidden = false;
-    state.modalOpen = true;
-    document.body.style.overflow = 'hidden';
+    openModal(els.editorModal);
     requestAnimationFrame(() => {
       const inputs = editorInputs();
       const firstEmpty = inputs.find((input) => !input.value) || inputs[0];
       firstEmpty.focus();
       firstEmpty.select();
     });
-  }
-
-  function closeEditor() {
-    if (!state.modalOpen) return;
-    state.modalOpen = false;
-    els.editorModal.hidden = true;
-    document.body.style.overflow = '';
-    if (state.lastFocus && typeof state.lastFocus.focus === 'function') state.lastFocus.focus();
   }
 
   function normalizePuzzleText(text) {
@@ -687,8 +1281,8 @@
   }
 
   function trapModalFocus(event) {
-    if (!state.modalOpen || event.key !== 'Tab') return;
-    const focusable = $$('button, input, textarea, [tabindex]:not([tabindex="-1"])', els.editorModal)
+    if (!state.activeModal || event.key !== 'Tab') return;
+    const focusable = $$('button, input, textarea, [tabindex]:not([tabindex="-1"])', state.activeModal)
       .filter((el) => !el.disabled && el.offsetParent !== null);
     if (!focusable.length) return;
     const first = focusable[0];
@@ -714,6 +1308,8 @@
       setCandidates(!state.showCandidates);
       try { window.localStorage.setItem('sudoku-candidates', state.showCandidates ? '1' : '0'); } catch (error) { /* ignore */ }
     });
+    els.randomBtn.addEventListener('click', openGenerator);
+    els.exportBtn.addEventListener('click', openExport);
     els.openEditor.addEventListener('click', openEditor);
     els.prevBtn.addEventListener('click', prevStep);
     els.nextBtn.addEventListener('click', nextStep);
@@ -748,10 +1344,10 @@
     });
 
     document.addEventListener('keydown', (event) => {
-      if (state.modalOpen) {
+      if (state.activeModal) {
         if (event.key === 'Escape') {
           event.preventDefault();
-          closeEditor();
+          closeActiveModal();
         } else {
           trapModalFocus(event);
         }
@@ -776,7 +1372,39 @@
       if (document.hidden && state.playing) stopPlayback();
     });
 
-    /* modal */
+    /* generator */
+    els.difficultyGrid.addEventListener('click', (event) => {
+      const card = event.target.closest('[data-difficulty]');
+      if (card) selectGeneratorDifficulty(card.dataset.difficulty);
+    });
+    els.generateBtn.addEventListener('click', generateRandom);
+    els.generationResult.addEventListener('click', (event) => {
+      if (event.target.closest('#useGenerated')) useGenerated(state.generated, false);
+      else if (event.target.closest('#exportGenerated')) useGenerated(state.generated, true);
+      else if (event.target.closest('#regenGenerated')) generateRandom();
+    });
+    els.closeGenerator.addEventListener('click', () => closeActiveModal());
+    els.generatorModal.addEventListener('click', (event) => {
+      if (event.target.closest('[data-close-generator]')) closeActiveModal();
+    });
+
+    /* export */
+    els.exportFormats.addEventListener('click', (event) => {
+      const format = event.target.closest('[data-format]');
+      if (!format) return;
+      state.exportFormat = format.dataset.format;
+      updateExportUI();
+    });
+    els.exportAnswer.addEventListener('change', updateExportUI);
+    els.exportSteps.addEventListener('change', updateExportUI);
+    els.copyPuzzle.addEventListener('click', () => copyText(state.puzzle || ''));
+    els.downloadExport.addEventListener('click', downloadExport);
+    els.closeExport.addEventListener('click', () => closeActiveModal());
+    els.exportModal.addEventListener('click', (event) => {
+      if (event.target.closest('[data-close-export]')) closeActiveModal();
+    });
+
+    /* editor modal */
     els.closeEditor.addEventListener('click', closeEditor);
     els.cancelEditor.addEventListener('click', closeEditor);
     els.editorModal.addEventListener('click', (event) => {
@@ -880,6 +1508,8 @@
   function init() {
     buildEditorGrid();
     buildEditorPresets();
+    buildDifficultyGrid();
+    buildExportFormats();
     bindEvents();
     renderTabs();
     restorePreferences();

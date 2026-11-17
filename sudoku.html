@@ -2,14 +2,14 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>数独推理台 · 每一步都有理由 | Berlin's Blog</title>
-<meta name="description" content="一个会讲人话的数独破解器：唯一候选、隐性唯一、数对、区块、X-Wing、Swordfish、XY-Wing 逐步演示，每一步都解释为什么。">
+<title>数独推理台 · 逐步讲解、随机出题与导出 | Berlin's Blog</title>
+<meta name="description" content="一个会讲人话的数独破解器：支持随机出题与 TXT / CSV / PNG 导出，并用唯一候选、数对、区块、X-Wing、Swordfish、XY-Wing 逐步解释每一步为什么。">
 <meta name="theme-color" content="#0e1013">
 <link rel="icon" href="images/favicon.png">
 <link rel="stylesheet" href="css/sudoku.css">
 <link rel="canonical" href="https://berlin-blog.github.io/sudoku.html">
-<meta property="og:title" content="数独推理台 · 每一步都有理由">
-<meta property="og:description" content="不只给答案。把数独的思考链拆成可播放的步骤，讲清楚看哪里、为什么、得出什么。">
+<meta property="og:title" content="数独推理台 · 逐步讲解、随机出题与导出">
+<meta property="og:description" content="不只给答案。随机生成唯一解题目，把思考链拆成可播放的步骤，还能导出题面、答案与 PNG 卡片。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://berlin-blog.github.io/sudoku.html">
 <meta property="og:image" content="https://berlin-blog.github.io/labs/thumbs/sudoku.webp">
@@ -42,6 +42,7 @@
       <button class="toggle is-on" id="candidatesToggle" type="button" aria-pressed="true">
         <span class="toggle-dot" aria-hidden="true"></span>候选数
       </button>
+      <button class="btn btn-spark" id="randomBtn" type="button"><span class="btn-glyph" aria-hidden="true">✦</span>随机出题</button>
       <button class="btn btn-ghost" id="openEditor" type="button">录入题目</button>
     </div>
   </header>
@@ -56,6 +57,7 @@
         <div class="board-head-right">
           <span class="status-pill" id="statusPill"><i aria-hidden="true"></i><span>待推理</span></span>
           <button class="btn btn-quiet mobile-link" id="toReason" type="button">讲解 <span aria-hidden="true">↓</span></button>
+          <button class="btn btn-quiet" id="exportBtn" type="button">导出 <span aria-hidden="true">↓</span></button>
           <button class="btn btn-quiet" id="cyclePreset" type="button">换一盘 <span aria-hidden="true">↻</span></button>
         </div>
       </div>
@@ -162,9 +164,81 @@
   </div>
 </div>
 
+<div class="modal" id="generatorModal" hidden>
+  <div class="modal-backdrop" data-close-generator></div>
+  <div class="modal-card generator-card" role="dialog" aria-modal="true" aria-labelledby="generatorTitle">
+    <button class="modal-close" id="closeGenerator" type="button" aria-label="关闭">×</button>
+    <div class="modal-head">
+      <p class="kicker">RANDOM PUZZLE</p>
+      <h2 id="generatorTitle">随机生成一道题</h2>
+      <p>每道题都会验证唯一解。难度按已知数控制，生成后可以直接开始推理，或导出成文件。</p>
+    </div>
+
+    <div class="generator-layout">
+      <div class="difficulty-block">
+        <p class="field-label">选择难度</p>
+        <div class="difficulty-grid" id="difficultyGrid" role="radiogroup" aria-label="选择随机题难度"></div>
+        <button class="btn btn-primary generate-btn" id="generateBtn" type="button" data-modal-focus>
+          <span aria-hidden="true">✦</span> 生成题目
+        </button>
+        <p class="generator-note">先生成完整终盘，再逐格挖空；每一步都检查是否仍为唯一解。</p>
+      </div>
+
+      <div class="generation-result" id="generationResult" aria-live="polite">
+        <div class="gen-empty">
+          <span class="gen-empty-mark" aria-hidden="true">9 × 9</span>
+          <p>选好难度，生成第一道随机题。</p>
+          <span>生成后会在这里预览题面与推理统计。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="exportModal" hidden>
+  <div class="modal-backdrop" data-close-export></div>
+  <div class="modal-card export-card" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+    <button class="modal-close" id="closeExport" type="button" aria-label="关闭">×</button>
+    <div class="modal-head">
+      <p class="kicker">EXPORT</p>
+      <h2 id="exportTitle">导出这道题</h2>
+      <p>可以带走题面、答案，或者一份带推理步骤的文本。生成题会附带题目编号，方便复盘。</p>
+    </div>
+
+    <div class="export-summary" id="exportSummary"></div>
+
+    <p class="field-label">文件格式</p>
+    <div class="export-formats" id="exportFormats" role="radiogroup" aria-label="选择导出格式"></div>
+
+    <div class="export-preview">
+      <span class="field-label">将导出</span>
+      <p id="exportPreview"></p>
+    </div>
+
+    <div class="export-options">
+      <label class="check-option">
+        <input type="checkbox" id="exportAnswer" checked>
+        <span class="check-box" aria-hidden="true"></span>
+        <span id="exportAnswerLabel">包含答案</span>
+      </label>
+      <label class="check-option" id="exportStepsOption">
+        <input type="checkbox" id="exportSteps">
+        <span class="check-box" aria-hidden="true"></span>
+        <span>包含分步解析</span>
+      </label>
+    </div>
+
+    <div class="modal-actions export-actions">
+      <button class="btn btn-ghost" id="copyPuzzle" type="button">复制题面</button>
+      <button class="btn btn-primary" id="downloadExport" type="button" data-modal-focus>下载 .txt</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="js/sudoku-engine.js" defer></script>
+<script src="js/sudoku-generator.js" defer></script>
 <script src="js/sudoku-app.js" defer></script>
 </body>
 </html>
