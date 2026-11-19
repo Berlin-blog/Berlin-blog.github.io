@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>数独实战 · 在线完成一局 | Berlin's Blog</title>
+<meta name="description" content="在线数独实战：按难度随机出题、每日一题、笔记与撤销、计时暂停、三档提示、自动存档和成绩分享。">
+<meta name="theme-color" content="#0e1013">
+<link rel="icon" href="images/favicon.png">
+<link rel="stylesheet" href="css/sudoku.css">
+<link rel="stylesheet" href="css/sudoku-play.css">
+<link rel="canonical" href="https://berlin-blog.github.io/sudoku-play.html">
+<meta property="og:title" content="数独实战 · 在线完成一局">
+<meta property="og:description" content="随机题或每日一题，填数、笔记、计时、提示，一局完成后的成绩卡可以分享。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://berlin-blog.github.io/sudoku-play.html">
+<meta property="og:image" content="https://berlin-blog.github.io/labs/thumbs/sudoku.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div class="ambient" aria-hidden="true"></div>
+
+<div class="app play-app">
+  <header class="masthead">
+    <a class="back-link" href="labs/index.html"><span aria-hidden="true">←</span> 作品集</a>
+    <div class="brand-block">
+      <span class="brand-mark" aria-hidden="true">
+        <i></i><i></i><i></i>
+        <i></i><i></i><i></i>
+        <i></i><i class="accent"></i><i></i>
+      </span>
+      <div>
+        <p class="eyebrow">SUDOKU / PLAY ROOM</p>
+        <h1>数独实战</h1>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="newGameBtn" type="button">新局</button>
+      <button class="btn btn-spark" id="pauseBtn" type="button" disabled>
+        <span class="btn-glyph" id="pauseGlyph" aria-hidden="true">Ⅱ</span>
+        <span id="pauseLabel">暂停</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="mode-bar" aria-label="数独模式">
+    <a href="sudoku.html">推理演示</a>
+    <a href="sudoku-play.html" class="is-active" aria-current="page">实战模式</a>
+    <button id="dailyNav" type="button">每日一题</button>
+    <span class="mode-note">纯前端 · 自动存档</span>
+  </nav>
+
+  <main class="play-workspace">
+    <section class="play-board-panel" aria-label="数独实战盘面">
+      <div class="play-head">
+        <div>
+          <p class="kicker" id="playKicker">PRACTICE MODE</p>
+          <h2 id="playTitle">准备开局</h2>
+        </div>
+        <div class="play-clock" aria-label="用时">
+          <span id="playTimer">00:00</span>
+          <small>TIME</small>
+        </div>
+      </div>
+
+      <div class="play-stats">
+        <span>已填 <b id="fillCount">0 / 81</b></span>
+        <span>冲突 <b id="conflictCount">0</b></span>
+        <span>提示 <b id="hintCount">0</b></span>
+        <span class="play-best">最佳 <b id="bestTime">—</b></span>
+      </div>
+
+      <div class="board-shell play-board-shell">
+        <span class="shell-tick tick-a" aria-hidden="true"></span>
+        <span class="shell-tick tick-b" aria-hidden="true"></span>
+        <div class="board" id="playBoard" role="grid" aria-label="九乘九数独盘面"></div>
+
+        <div class="board-veil" id="boardVeil">
+          <span class="board-veil-mark" aria-hidden="true">9 × 9</span>
+          <p>选一个难度，开始这一局。</p>
+          <button class="btn btn-primary" id="veilStart" type="button">选择难度 <span aria-hidden="true">→</span></button>
+        </div>
+
+        <div class="pause-veil" id="pauseVeil" hidden>
+          <span class="pause-mark" aria-hidden="true">Ⅱ</span>
+          <p>已暂停</p>
+          <small>计时已停止，盘面暂时隐藏。</small>
+          <button class="btn btn-primary" id="resumeBtn" type="button">继续做题</button>
+        </div>
+      </div>
+
+      <div class="play-meta">
+        <span id="clueMeta">—</span>
+        <span id="sourceMeta">—</span>
+        <span class="play-meta-actions">
+          <button class="play-link" id="exportBtn" type="button" disabled>导出题目</button>
+          <button class="play-link" id="restartBtn" type="button" disabled>重开</button>
+        </span>
+      </div>
+    </section>
+
+    <aside class="play-side" aria-label="做题工具">
+      <div class="play-card input-card">
+        <div class="input-modes" role="group" aria-label="输入模式">
+          <button class="is-active" id="modeDigit" type="button" aria-pressed="true">填数</button>
+          <button id="modeNote" type="button" aria-pressed="false">笔记</button>
+        </div>
+        <div class="number-pad" id="numberPad" aria-label="数字键盘"></div>
+        <div class="tool-actions">
+          <button id="undoBtn" type="button" disabled>撤销</button>
+          <button id="eraseBtn" type="button">擦除</button>
+          <button id="checkBtn" type="button">检查</button>
+          <button id="hintBtn" class="hint-btn" type="button">提示</button>
+        </div>
+      </div>
+
+      <div class="play-card hint-card" id="hintPanel" hidden>
+        <div class="hint-head">
+          <span id="hintLevel">提示 1 / 3</span>
+          <button id="closeHint" type="button" aria-label="收起提示">×</button>
+        </div>
+        <h3 id="hintTitle">先看高亮区域</h3>
+        <p id="hintText"></p>
+        <div class="hint-progress" aria-hidden="true"><i></i><i></i><i></i></div>
+        <button class="btn btn-primary hint-next" id="hintNext" type="button">再提示一点</button>
+      </div>
+
+      <div class="play-card play-info-card">
+        <div class="side-stats" id="sideStats">
+          <div><span>已完成</span><b id="totalDone">0</b></div>
+          <div><span>连续打卡</span><b id="streakDays">0 天</b></div>
+        </div>
+        <div class="daily-strip" id="dailyStrip">
+          <span>今日一题</span>
+          <b id="dailyStatus">未完成</b>
+        </div>
+        <p class="shortcuts"><kbd>1–9</kbd> 填数 · <kbd>N</kbd> 笔记 · <kbd>⌘/Ctrl Z</kbd> 撤销 · <kbd>Space</kbd> 暂停</p>
+        <a class="play-link play-review-link" href="sudoku.html">去推理台看思路 →</a>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="page-footer">
+    <p>先做出来，再回头看懂。每一局都会自动保存在本机。</p>
+    <p><a href="sudoku.html">推理演示</a><span>·</span><a href="labs/index.html">更多小作品</a><span>·</span><a href="index.html">主页</a></p>
+  </footer>
+</div>
+
+<div class="modal" id="startModal" hidden>
+  <div class="modal-backdrop" data-close-start></div>
+  <div class="modal-card start-card" role="dialog" aria-modal="true" aria-labelledby="startTitle">
+    <button class="modal-close" id="closeStart" type="button" aria-label="关闭">×</button>
+    <div class="modal-head">
+      <p class="kicker">PLAY SUDOKU</p>
+      <h2 id="startTitle">开一局</h2>
+      <p>随机题或每日一题，难度按已知数控制。每局自动存档，关掉页面也不会丢进度。</p>
+    </div>
+
+    <button class="resume-card" id="resumeCard" type="button" hidden>
+      <span class="resume-kicker">CONTINUE</span>
+      <b id="resumeTitle">继续上一局</b>
+      <small id="resumeMeta">—</small>
+    </button>
+
+    <button class="daily-start" id="dailyStart" type="button">
+      <span class="daily-start-date" id="dailyDate">—</span>
+      <span>
+        <b>每日一题 · 进阶</b>
+        <small id="dailyHint">同一天同一道题，完成后累计连续打卡。</small>
+      </span>
+      <span class="daily-start-arrow" aria-hidden="true">→</span>
+    </button>
+
+    <div class="start-divider"><span>随机难度</span></div>
+    <div class="start-diffs" id="startDifficulties"></div>
+
+    <div class="start-stats" id="startStats"></div>
+    <button class="reset-stats" id="resetStats" type="button">清空本地成绩</button>
+  </div>
+</div>
+
+<div class="modal" id="resultModal" hidden>
+  <div class="modal-backdrop" data-close-result></div>
+  <div class="modal-card result-card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+    <button class="modal-close" id="closeResult" type="button" aria-label="关闭">×</button>
+    <div class="result-glow" aria-hidden="true"></div>
+    <p class="kicker">PUZZLE COMPLETE</p>
+    <h2 id="resultTitle">完成。</h2>
+    <div class="result-time" id="resultTime">00:00</div>
+    <p class="result-sub" id="resultSub"></p>
+    <div class="result-stats" id="resultStats"></div>
+    <div class="result-actions">
+      <button class="btn btn-primary" id="againBtn" type="button">再来一局</button>
+      <a class="btn btn-ghost" id="reviewBtn" href="sudoku.html">去推理台复盘 <span aria-hidden="true">→</span></a>
+      <button class="btn btn-ghost" id="downloadCard" type="button">下载成绩卡</button>
+      <button class="btn btn-quiet" id="copyShare" type="button">复制成绩</button>
+      <button class="btn btn-quiet" id="exportResult" type="button">导出题面</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/sudoku-engine.js" defer></script>
+<script src="js/sudoku-generator.js" defer></script>
+<script src="js/sudoku-board.js" defer></script>
+<script src="js/sudoku-play.js" defer></script>
+</body>
+</html>

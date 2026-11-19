@@ -1044,6 +1044,40 @@
     return { ...result.stats, techniques: unique, warnings: result.warnings };
   }
 
+  /*
+   * 从当前盘面（而不是初始题面）推进一步。
+   * 实战页提示系统使用：返回一步可以直接展示的高亮与讲解数据。
+   */
+  function nextStep(input) {
+    const grid = parsePuzzle(input);
+    const cands = computeCandidates(grid);
+    gridValueForExplain = grid;
+    const raw = findLogicalStep(grid, cands) || makeFallback(grid, cands, true);
+    if (!raw) return null;
+
+    const copy = describe(raw, grid, cands);
+    let action;
+    if (raw.kind === 'naked-single' || raw.kind === 'hidden-single' || raw.kind === 'fallback') {
+      action = { type: 'place', idx: raw.idx, value: raw.value };
+    } else {
+      action = { type: 'eliminate', changes: raw.changes.map((c) => ({ idx: c.idx, values: c.values.slice() })) };
+    }
+
+    return {
+      kind: raw.kind,
+      technique: raw.technique,
+      techniqueEn: raw.techniqueEn,
+      tone: raw.tone,
+      title: copy.title,
+      summary: copy.summary,
+      chain: copy.chain,
+      principle: copy.principle,
+      highlights: copy.highlights,
+      action,
+      pure: raw.kind !== 'fallback',
+    };
+  }
+
   const PRESETS = [
     {
       id: 'starter', name: '热身', label: '先学会看候选数', difficulty: '入门', accent: 'mint',
@@ -1071,7 +1105,7 @@
     ALL, BITS, ROWS, COLS, BOXES, UNITS, PEERS, PRESETS,
     maskValues, countBits, digitList, CELL, CELL_CN, unitName,
     parsePuzzle, computeCandidates, countSolutions, solveGrid, isSolved,
-    solvePuzzle, hintsFor,
+    solvePuzzle, hintsFor, nextStep,
   };
 
   if (typeof module !== 'undefined' && module.exports) module.exports = Engine;

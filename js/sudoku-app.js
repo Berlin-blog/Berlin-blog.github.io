@@ -3,8 +3,10 @@
 
   const E = window.SudokuEngine;
   const G = window.SudokuGenerator;
+  const BoardView = window.SudokuBoard;
   if (!E) throw new Error('SudokuEngine 未加载');
   if (!G) throw new Error('SudokuGenerator 未加载');
+  if (!BoardView) throw new Error('SudokuBoard 未加载');
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -82,6 +84,8 @@
     genBusy: false,
     exportFormat: 'txt',
   };
+
+  const boardView = new BoardView(els.board);
 
   const EXPORT_FORMATS = {
     txt: {
@@ -303,65 +307,21 @@
       });
     }
 
-    const frag = document.createDocumentFragment();
-    for (let block = 0; block < 9; block++) {
-      const blockEl = document.createElement('div');
-      blockEl.className = 'board-block';
-      blockEl.setAttribute('role', 'row');
-      for (let local = 0; local < 9; local++) {
-        const br = Math.floor(block / 3);
-        const bc = block % 3;
-        const r = br * 3 + Math.floor(local / 3);
-        const c = bc * 3 + (local % 3);
-        const idx = r * 9 + c;
-        const value = grid[idx];
-        const isGiven = Boolean(givens[idx]);
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        cell.setAttribute('role', 'gridcell');
-        cell.dataset.index = idx;
-        if (isGiven) cell.classList.add('is-given');
-        else if (value) cell.classList.add('is-solved');
-        if (unitCells.has(idx)) cell.classList.add('unit-hint');
-        if (inspect.has(idx)) cell.classList.add('inspect');
-        if (evidence.has(idx)) cell.classList.add('evidence');
-        if (targets.has(idx)) cell.classList.add('target');
-        if (focus.has(idx)) cell.classList.add('focus');
-
-        if (value) {
-          const valueEl = document.createElement('span');
-          valueEl.className = 'value';
-          valueEl.textContent = String(value);
-          cell.appendChild(valueEl);
-          cell.setAttribute('aria-label', `第${r + 1}行第${c + 1}列，${isGiven ? '已知' : '推出'}数字 ${value}`);
-        } else {
-          const notes = document.createElement('div');
-          notes.className = 'notes';
-          const goneSet = ghost.get(idx);
-          const candidateValues = E.maskValues(cands[idx]);
-          for (let d = 1; d <= 9; d++) {
-            const note = document.createElement('span');
-            note.className = 'note';
-            if (cands[idx] & E.BITS[d]) {
-              note.textContent = String(d);
-            } else if (goneSet && goneSet.has(d)) {
-              note.textContent = String(d);
-              note.classList.add('gone');
-            } else {
-              note.classList.add('empty');
-            }
-            notes.appendChild(note);
-          }
-          cell.appendChild(notes);
-          cell.setAttribute('aria-label', `第${r + 1}行第${c + 1}列，候选数 ${candidateValues.join('、') || '无'}`);
-        }
-        blockEl.appendChild(cell);
-      }
-      frag.appendChild(blockEl);
-    }
-    els.board.innerHTML = '';
-    els.board.appendChild(frag);
-    els.board.classList.toggle('hide-notes', !state.showCandidates);
+    boardView.render({
+      grid,
+      givens,
+      cands,
+      ghost,
+      activeIndex: -1,
+      highlights: {
+        'unit-hint': unitCells,
+        inspect,
+        evidence,
+        target: targets,
+        focus,
+      },
+    });
+    boardView.setNotesVisible(state.showCandidates);
     els.board.dataset.step = String(state.cursor + 1);
   }
 
@@ -399,9 +359,11 @@
     const fallback = stats.fallbackSteps;
     const lede = random
       ? `这是随机生成的${meta.difficulty.name}题，编号 ${meta.id}：${givens} 个已知数，拆成 ${total} 步。可以开始推理，也可以从右上角导出。`
-      : custom
-        ? `这是你录入的题：${givens} 个已知数，拆成 ${total} 步。先看候选数，再跟着证据走。`
-        : preset
+      : meta.fromPlay
+        ? `这是从实战模式带回来的题：${givens} 个已知数，拆成 ${total} 步。对照刚才的做法，看看哪些结构可以更快看出来。`
+        : custom
+          ? `这是你录入的题：${givens} 个已知数，拆成 ${total} 步。先看候选数，再跟着证据走。`
+          : preset
           ? `${preset.note} 共 ${givens} 个已知数，会拆成 ${total} 步。`
           : `这盘题有 ${givens} 个已知数，会拆成 ${total} 步。`;
     const warningHtml = state.result.warnings.length
@@ -543,6 +505,7 @@
   }
 
   function currentTitle(meta) {
+    if (meta && meta.fromPlay) return '实战复盘';
     if (meta && meta.type === 'random') return `随机题 · ${meta.difficulty.name}`;
     const preset = meta && meta.preset;
     if (!preset) return '自定义题目';
@@ -570,6 +533,8 @@
       els.puzzleKicker.textContent = `PUZZLE ${pad2(meta.presetIndex + 1)} / ${pad2(E.PRESETS.length)} · ${meta.preset.difficulty}`;
     } else if (meta && meta.type === 'random') {
       els.puzzleKicker.textContent = `RANDOM PUZZLE · ${meta.difficulty.name} · ${meta.id}`;
+    } else if (meta && meta.fromPlay) {
+      els.puzzleKicker.textContent = 'REVIEW · 实战复盘';
     } else {
       els.puzzleKicker.textContent = 'CUSTOM PUZZLE · 自定义';
     }
@@ -602,7 +567,7 @@
 
   function setCandidates(show) {
     state.showCandidates = show;
-    els.board.classList.toggle('hide-notes', !show);
+    boardView.setNotesVisible(show);
     els.candidatesToggle.classList.toggle('is-on', show);
     els.candidatesToggle.setAttribute('aria-pressed', String(show));
   }
@@ -1513,7 +1478,18 @@
     bindEvents();
     renderTabs();
     restorePreferences();
-    loadPreset(1, { toast: false });
+    const params = new URLSearchParams(window.location.search);
+    const reviewPuzzle = params.get('p');
+    if (reviewPuzzle) {
+      try {
+        loadPuzzle(reviewPuzzle, { type: 'custom', fromPlay: true });
+        showToast('已载入实战题目');
+      } catch (error) {
+        loadPreset(1, { toast: false });
+      }
+    } else {
+      loadPreset(1, { toast: false });
+    }
   }
 
   init();

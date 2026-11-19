@@ -178,6 +178,44 @@ body::before {
   letter-spacing: .03em;
 }
 
+/* --------------------------------- mode bar -------------------------------- */
+.mode-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 2px 0;
+}
+.mode-bar a, .mode-bar button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 31px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 10.5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: .18s ease;
+}
+.mode-bar a:hover, .mode-bar button:hover {
+  color: var(--text-soft);
+  background: rgba(255, 255, 255, .035);
+}
+.mode-bar a.is-active {
+  border-color: rgba(227, 177, 91, .25);
+  background: var(--amber-soft);
+  color: var(--amber-bright);
+}
+.mode-note {
+  margin-left: auto;
+  color: var(--muted-2);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: .06em;
+}
+
 /* --------------------------------- buttons --------------------------------- */
 .btn {
   display: inline-flex;
@@ -195,6 +233,10 @@ body::before {
   cursor: pointer;
   white-space: nowrap;
   transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+.btn:focus-visible, .icon-btn:focus-visible {
+  outline: 2px solid var(--amber-bright);
+  outline-offset: 2px;
 }
 .btn:hover { transform: translateY(-1px); }
 .btn:active { transform: translateY(0); }

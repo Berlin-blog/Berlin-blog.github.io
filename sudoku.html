@@ -47,6 +47,12 @@
     </div>
   </header>
 
+  <nav class="mode-bar" aria-label="数独模式">
+    <a href="sudoku.html" class="is-active" aria-current="page">推理演示</a>
+    <a href="sudoku-play.html">实战模式</a>
+    <span class="mode-note">逐步推理 · 每一步都有理由</span>
+  </nav>
+
   <main class="workspace">
     <section class="board-panel" aria-label="数独盘面">
       <div class="board-head">
@@ -239,6 +245,7 @@
 
 <script src="js/sudoku-engine.js" defer></script>
 <script src="js/sudoku-generator.js" defer></script>
+<script src="js/sudoku-board.js" defer></script>
 <script src="js/sudoku-app.js" defer></script>
 </body>
 </html>
